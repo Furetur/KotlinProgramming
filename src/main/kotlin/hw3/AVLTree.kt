@@ -5,18 +5,54 @@ import java.util.*
 import kotlin.Comparator
 
 
+/**
+ * AVLTree implementation of Map
+ * @param K type of keys
+ * @param V type of values
+ * @param comparator is used to compare keys
+ * @param root is used internally by AVLTree, represents the tree
+ * @param rootSize number of nodes in the root's subtree
+ * @constructor Creates an empty AVLTree if parameters root and rootSize are not received, acts as a wrapper around [root] otherwise
+ */
 class ImmutableAVLTree<K, V>(
     private val comparator: Comparator<K>,
     private val root: Node<K, V>? = null,
     private val rootSize: Int = 0
 ) : Map<K, V> {
 
+
+    override val entries: Set<Map.Entry<K, V>>
+        get() = root?.flatten()?.toSet() ?: setOf()
+
+
+    override val keys: Set<K>
+        get() = entries.map { entry -> entry.key }.toSet()
+
+
+    override val size: Int
+        get() = rootSize
+
+
+    override val values: Collection<V>
+        get() = entries.map { entry -> entry.value }
+
+
+    /**
+     * A basic implementation of Map.Entry
+     */
     class Entry<K, V>(override val key: K, override val value: V) : Map.Entry<K, V> {
         override fun toString(): String {
             return "($key, $value)"
         }
     }
 
+
+    /**
+     * Node of the ImmutableAVLTree
+     * @param K type of the node's key
+     * @param V type of the node's value
+     * @constructor Creates a node and sets its left and right children
+     */
     class Node<K, V>(val key: K, val value: V, val left: Node<K, V>? = null, val right: Node<K, V>? = null) {
         private val leftHeight: Int
             get() = left?.height ?: 0
@@ -26,11 +62,7 @@ class ImmutableAVLTree<K, V>(
         private val height: Int = max(leftHeight, rightHeight) + 1
         private val balanceFactor: Int = rightHeight - leftHeight
 
-        /**
-         * Performs the right rotation
-         * @return [Node] the root of the new subtree
-         * @throws [IllegalCallerException] if node's left child is null
-         */
+
         private fun rotateRight(): Node<K, V> {
             // store variables for quick access
             val willBecomeNewRoot = left ?: throw IllegalCallerException("Node's left child cannot be null")
@@ -55,11 +87,7 @@ class ImmutableAVLTree<K, V>(
             )
         }
 
-        /**
-         * Performs the left rotation
-         * @return [Node] the root of the new subtree
-         * @throws [IllegalCallerException] if node's right child is null
-         */
+
         private fun rotateLeft(): Node<K, V> {
             // store variables for quick access
             val willBecomeNewRoot = right ?: throw IllegalCallerException("Node's right child cannot be null")
@@ -83,10 +111,7 @@ class ImmutableAVLTree<K, V>(
             )
         }
 
-        /**
-         * Balanced the node if it is needed
-         * @return [Node] the root of the new balanced subtree
-         */
+
         private fun balance(): Node<K, V> {
             if (balanceFactor == 2) {
                 // node.right is not null because balanceFactor == 2
@@ -101,6 +126,7 @@ class ImmutableAVLTree<K, V>(
             // already balanced
             return this
         }
+
 
         /**
          * Finds the [V] value that corresponds to the received [K] key
@@ -120,6 +146,7 @@ class ImmutableAVLTree<K, V>(
             // key > this.key
             return right?.get(key, comparator)
         }
+
 
         /**
          * Sets the value of received key
@@ -149,12 +176,14 @@ class ImmutableAVLTree<K, V>(
             return Node(this.key, this.value, left, newRight).balance()
         }
 
+
         private fun findNodeWithMinKey(): Node<K, V> {
             if (left == null) {
                 return this
             }
             return left.findNodeWithMinKey()
         }
+
 
         private fun removeNodeWithMinKey(): Node<K, V>? {
             if (left == null) {
@@ -194,6 +223,7 @@ class ImmutableAVLTree<K, V>(
             return Node(newRoot.key, newRoot.value, left, newRight).balance()
         }
 
+
         /**
          * Converts the following subtree to a list
          */
@@ -211,20 +241,11 @@ class ImmutableAVLTree<K, V>(
         }
     }
 
-    override val entries: Set<Map.Entry<K, V>>
-        get() = root?.flatten()?.toSet() ?: setOf()
-
-    override val keys: Set<K>
-        get() = entries.map { entry -> entry.key }.toSet()
-
-    override val size: Int
-        get() = rootSize
-    override val values: Collection<V>
-        get() = entries.map { entry -> entry.value }
 
     override fun containsKey(key: K): Boolean {
         return get(key) != null
     }
+
 
     override fun containsValue(value: V): Boolean {
         if (root == null) {
@@ -248,14 +269,24 @@ class ImmutableAVLTree<K, V>(
         return false
     }
 
+
     override fun get(key: K): V? {
         return root?.get(key, comparator)
     }
+
 
     override fun isEmpty(): Boolean {
         return size == 0
     }
 
+
+    /**
+     * Puts a value in the AVLTree. (Like MutableMap.put)
+     * However, does not change the tree itself but returns the new updated tree
+     * @param key of the entry to put
+     * @param value of the entry to put
+     * @return new updated tree
+     */
     fun put(key: K, value: V): ImmutableAVLTree<K, V> {
         // tree is empty
         if (root == null) {
@@ -268,6 +299,13 @@ class ImmutableAVLTree<K, V>(
         return ImmutableAVLTree(comparator, newRoot, newSize)
     }
 
+
+    /**
+     * Removes the entry with the received [key]
+     * However, similarly to `put` does not update the folowing tree, but returns a new updated tree
+     * @param key of the entry that should be removed
+     * @return new updated tree
+     */
     fun remove(key: K): ImmutableAVLTree<K, V> {
         if (!containsKey(key)) {
             return this

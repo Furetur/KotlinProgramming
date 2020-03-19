@@ -16,33 +16,38 @@ val rightChild = ImmutableAVLTree.Node("d", 3, leftChildOfRightChild, rightChild
 val root = ImmutableAVLTree.Node("b", 2, leftChild, rightChild)
 
 
-
 internal class ImmutableAVLTreeNodeTest {
+
 
     @Test
     fun get_shouldReturnCorrectValues1() {
         assertEquals(1, root.get("a", stringComparator))
     }
 
+
     @Test
     fun get_shouldReturnCorrectValues2() {
         assertEquals(5, root.get("e", stringComparator))
     }
+
 
     @Test
     fun get_shouldReturnCorrectValues3() {
         assertEquals(4, root.get("c", stringComparator))
     }
 
+
     @Test
     fun get_shouldReturnCorrectValues4() {
         assertEquals(3, root.get("d", stringComparator))
     }
 
+
     @Test
     fun get_shouldReturnCorrectValues5() {
         assertEquals(2, root.get("b", stringComparator))
     }
+
 
     @Test
     fun set_shouldSetTheRootsValue() {
@@ -50,11 +55,13 @@ internal class ImmutableAVLTreeNodeTest {
         assertEquals(3, newRoot.value)
     }
 
+
     @Test
     fun set_shouldSetTheMostRemoteNodeValueThatShouldBeAccessedByGet() {
         val newRoot = root.set("e", 6, stringComparator)
         assertEquals(6, newRoot.get("e", stringComparator))
     }
+
 
     @Test
     fun set_shouldAddNewNodesThatCanBeAccessedByGet() {
@@ -62,11 +69,13 @@ internal class ImmutableAVLTreeNodeTest {
         assertEquals(101, newRoot.get("ab", stringComparator))
     }
 
+
     @Test
     fun set_shouldWorkWithEmptyStrings() {
         val newRoot = root.set("", 909, stringComparator)
         assertEquals(909, newRoot.get("", stringComparator))
     }
+
 
     @Test
     fun remove_shouldRemoveRoot() {
@@ -75,12 +84,14 @@ internal class ImmutableAVLTreeNodeTest {
         assertEquals(null, newRoot.get("b", stringComparator))
     }
 
+
     @Test
     fun remove_shouldRemoveRootOfSubtree() {
         val newRoot = root.remove("d", stringComparator) ?: fail("new root should not be null")
 
         assertEquals(null, newRoot.get("d", stringComparator))
     }
+
 
     @Test
     fun remove_shouldRemoveLeaf1() {
@@ -89,12 +100,14 @@ internal class ImmutableAVLTreeNodeTest {
         assertEquals(null, newRoot.get("c", stringComparator))
     }
 
+
     @Test
     fun remove_shouldRemoveLeaf2() {
         val newRoot = root.remove("e", stringComparator) ?: fail("new root should not be null")
 
         assertEquals(null, newRoot.get("e", stringComparator))
     }
+
 
     @Test
     fun remove_shouldRemoveLeaf3() {
