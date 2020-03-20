@@ -16,6 +16,7 @@ class PriorityQueue<E> {
 
     private val treeSet: TreeSet<Entry<E>> = TreeSet(entryComparator)
 
+
     /**
      * Number of enqueued elements
      */
