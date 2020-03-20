@@ -15,15 +15,18 @@ class Container<E>(val value: E)
 internal class PriorityQueueTest {
     var queue = PriorityQueue<Int>()
 
+
     @BeforeEach
     fun resetQueue() {
         queue = PriorityQueue<Int>()
     }
 
+
     @Test
     fun getSize_shouldReturnZeroForNewQueue() {
         assertEquals(0, queue.size)
     }
+
 
     @Test
     fun getSize_shouldReturnNumberOfEnqueuedElements() {
@@ -55,6 +58,7 @@ internal class PriorityQueueTest {
         assertEquals(oldSize - 1, queue.size)
     }
 
+
     @Test
     fun enqueue_shouldWorkForEmptyQueue() {
         queue.enqueue(190, 1)
@@ -62,12 +66,14 @@ internal class PriorityQueueTest {
         assertEquals(190, valueFromQueue)
     }
 
+
     @Test
     fun enqueue_shouldEnqueueElementsWithoutExceptions() {
         for (i in 0..1000) {
             queue.enqueue(i, i)
         }
     }
+
 
     @Test
     fun dequeue_shouldThrowExceptionForEmptyQueue() {
@@ -78,6 +84,7 @@ internal class PriorityQueueTest {
             // success
         }
     }
+
 
     @Test
     fun dequeue_shouldThrowExceptionForEmptiedQueue() {
@@ -95,12 +102,14 @@ internal class PriorityQueueTest {
         }
     }
 
+
     @Test
     fun dequeue_shouldDeleteElement() {
         queue.enqueue(1, 1)
         queue.dequeue()
         assertEquals(0, queue.size)
     }
+
 
     @Test
     fun dequeue_shouldBeAbleToDequeueAllElements() {
@@ -113,12 +122,14 @@ internal class PriorityQueueTest {
         assertEquals(0, queue.size)
     }
 
+
     @Test
     fun dequeue_shouldGetElementWithTopPriority() {
         queue.enqueue(0, 2)
         queue.enqueue(101, 1)
         assertEquals(0, queue.dequeue())
     }
+
 
     @Test
     fun dequeue_shouldGetElementsInTheCorrectOrder() {
@@ -136,6 +147,7 @@ internal class PriorityQueueTest {
         assertEquals(expectedOutput, actualOutput)
     }
 
+
     @Test
     fun dequeue_shouldGetElementsInTheCorrectOrderBig() {
         val expectedOutput = MutableList<Int>(1000) { it }
@@ -151,6 +163,7 @@ internal class PriorityQueueTest {
         }
         assertEquals(expectedOutput, actualOutput)
     }
+
 
     @Test
     fun dequeue_shouldReturnValueWithHighestPriorityInPopulatedQueue() {
