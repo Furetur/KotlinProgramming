@@ -137,6 +137,22 @@ internal class PriorityQueueTest {
     }
 
     @Test
+    fun dequeue_shouldGetElementsInTheCorrectOrderBig() {
+        val expectedOutput = MutableList<Int>(1000) { it }
+
+        for (i in 999 downTo 0) {
+            queue.enqueue(i, 9999 - i)
+        }
+
+        val actualOutput = mutableListOf<Int>()
+
+        for (i in 0..999) {
+            actualOutput.add(queue.dequeue())
+        }
+        assertEquals(expectedOutput, actualOutput)
+    }
+
+    @Test
     fun dequeue_shouldReturnValueWithHighestPriorityInPopulatedQueue() {
         for (i in 0..1000) {
             queue.enqueue(i, i)
