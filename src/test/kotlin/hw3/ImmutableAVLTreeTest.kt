@@ -191,4 +191,46 @@ internal class ImmutableAVLTreeTest {
         val newTree = emptyTree.remove("a")
         assertEquals(0, newTree.size)
     }
+
+    @Test
+    fun get_shouldReadValuesFromBigTrees1() {
+        val intComparator = Comparator<Int>{num1, num2 -> num1 - num2}
+        var newTree = ImmutableAVLTree<Int, Int>(intComparator)
+        for (i in 0..1000) {
+            newTree = newTree.put(i, i)
+        }
+        for (i in 0..1000) {
+            assertEquals(i, newTree[i])
+        }
+    }
+
+    @Test
+    fun containsKey_shouldReturnFalseForValuesNotInBigTree() {
+        val intComparator = Comparator<Int>{num1, num2 -> num1 - num2}
+        var newTree = ImmutableAVLTree<Int, Int>(intComparator)
+        for (i in 0..1000) {
+            newTree = newTree.put(i, i)
+        }
+        assert(!newTree.containsKey(10000))
+    }
+
+    @Test
+    fun containsValue_shouldReturnFalseForValuesNotInBigTree() {
+        val intComparator = Comparator<Int>{num1, num2 -> num1 - num2}
+        var newTree = ImmutableAVLTree<Int, String>(intComparator)
+        for (i in 0..1000) {
+            newTree = newTree.put(i, "value=$i")
+        }
+        assert(!newTree.containsValue("value=100000"))
+    }
+
+    @Test
+    fun containsValue_shouldReturnTrueForValuesInBigTree() {
+        val intComparator = Comparator<Int>{num1, num2 -> num1 - num2}
+        var newTree = ImmutableAVLTree<Int, String>(intComparator)
+        for (i in 0..1000) {
+            newTree = newTree.put(i, "value=$i")
+        }
+        assert(newTree.containsValue("value=777"))
+    }
 }
