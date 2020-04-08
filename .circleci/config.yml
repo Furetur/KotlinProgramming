@@ -2,7 +2,7 @@
 version: 2.1
 # Use a package of configuration called an orb.
 orbs:
-  gradle: circleci/gradle@5.2.1
+  gradle: circleci/gradle@2.1.0
 workflows:
   checkout-build-test:
     jobs:
