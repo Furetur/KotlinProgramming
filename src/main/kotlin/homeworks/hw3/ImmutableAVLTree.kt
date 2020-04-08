@@ -1,9 +1,11 @@
-package hw3
+package homeworks.hw3
 
 import java.lang.Integer.max
-import java.util.*
+import java.util.Stack
 import kotlin.Comparator
 
+const val BALANCE_FACTOR_RIGHT_SUBTREE_TOO_HIGH = 2
+const val BALANCE_FACTOR_LEFT_SUBTREE_TOO_HIGH = -2
 
 /**
  * AVLTree implementation of Map
@@ -12,7 +14,8 @@ import kotlin.Comparator
  * @param comparator is used to compare keys
  * @param root is used internally by AVLTree, represents the tree
  * @param rootSize number of nodes in the root's subtree
- * @constructor Creates an empty AVLTree if parameters root and rootSize are not received, acts as a wrapper around [root] otherwise
+ * @constructor Creates an empty AVLTree if parameters root and rootSize are not received,
+ * acts as a wrapper around [root] otherwise
  */
 class ImmutableAVLTree<K, V>(
     private val comparator: Comparator<K>,
@@ -20,22 +23,17 @@ class ImmutableAVLTree<K, V>(
     private val rootSize: Int = 0
 ) : Map<K, V> {
 
-
     override val entries: Set<Map.Entry<K, V>>
         get() = root?.flatten()?.toSet() ?: setOf()
-
 
     override val keys: Set<K>
         get() = entries.map { entry -> entry.key }.toSet()
 
-
     override val size: Int
         get() = rootSize
 
-
     override val values: Collection<V>
         get() = entries.map { entry -> entry.value }
-
 
     /**
      * A basic implementation of Map.Entry
@@ -45,7 +43,6 @@ class ImmutableAVLTree<K, V>(
             return "($key, $value)"
         }
     }
-
 
     /**
      * Node of the ImmutableAVLTree
@@ -61,7 +58,6 @@ class ImmutableAVLTree<K, V>(
 
         private val height: Int = max(leftHeight, rightHeight) + 1
         private val balanceFactor: Int = rightHeight - leftHeight
-
 
         private fun rotateRight(): Node<K, V> {
             // store variables for quick access
@@ -87,7 +83,6 @@ class ImmutableAVLTree<K, V>(
             )
         }
 
-
         private fun rotateLeft(): Node<K, V> {
             // store variables for quick access
             val willBecomeNewRoot = right ?: throw IllegalCallerException("Node's right child cannot be null")
@@ -111,42 +106,41 @@ class ImmutableAVLTree<K, V>(
             )
         }
 
-
         private fun balance(): Node<K, V> {
-            if (balanceFactor == 2) {
+            val rightSubtreeIsTooHigh = balanceFactor == BALANCE_FACTOR_RIGHT_SUBTREE_TOO_HIGH
+            val leftSubtreeIsTooHigh = balanceFactor == BALANCE_FACTOR_LEFT_SUBTREE_TOO_HIGH
+
+            if (!rightSubtreeIsTooHigh && !leftSubtreeIsTooHigh) {
+                // already balanced
+                return this
+            }
+
+            return if (rightSubtreeIsTooHigh) {
                 // node.right is not null because balanceFactor == 2
                 val newRight = if (right!!.balanceFactor < 0) right.rotateRight() else right
-                return Node(key, value, left, newRight).rotateLeft()
-            }
-            if (balanceFactor == -2) {
+                Node(key, value, left, newRight).rotateLeft()
+            } else {
                 // node.left is not null because balanceFactor == -2
                 val newLeft = if (left!!.balanceFactor > 0) left.rotateLeft() else left
-                return Node(key, value, newLeft, right).rotateRight()
+                Node(key, value, newLeft, right).rotateRight()
             }
-            // already balanced
-            return this
         }
-
 
         /**
          * Finds the [V] value that corresponds to the received [K] key
          * @param key hat should be found
          * @param comparator is used to compare the keys
-         * @return the value that is found or null if the following hw3.ImmutableAVLTree does not contain the received key
+         * @return the value that is found or null
+         * if the following homeworks.hw3.ImmutableAVLTree does not contain the received key
          */
         fun get(key: K, comparator: Comparator<K>): V? {
             // key == this.key
             if (comparator.compare(key, this.key) == 0) {
                 return this.value
             }
-            // key < this.key
-            if (comparator.compare(key, this.key) < 0) {
-                return left?.get(key, comparator)
-            }
-            // key > this.key
-            return right?.get(key, comparator)
+            val destination = if (comparator.compare(key, this.key) < 0) left else right
+            return destination?.get(key, comparator)
         }
-
 
         /**
          * Sets the value of received key
@@ -155,27 +149,30 @@ class ImmutableAVLTree<K, V>(
          * @return the root of the new subtree
          */
         fun set(key: K, value: V, comparator: Comparator<K>): Node<K, V> {
-            // key < this.key
-            if (comparator.compare(key, this.key) < 0) {
-                val newLeft = left?.set(key, value, comparator) ?: Node(
-                    key,
-                    value
-                )
-                return Node(this.key, this.value, newLeft, right).balance()
-            }
             // key == this.key
             if (comparator.compare(key, this.key) == 0) {
                 // update this node
                 return Node(this.key, value, left, right)
             }
-            // key > this.key
-            val newRight = right?.set(key, value, comparator) ?: Node(
-                key,
-                value
-            )
-            return Node(this.key, this.value, left, newRight).balance()
-        }
 
+            val shouldGoLeft = comparator.compare(key, this.key) < 0
+
+            return if (shouldGoLeft) {
+                // key < this.key
+                val newLeft = left?.set(key, value, comparator) ?: Node(
+                    key,
+                    value
+                )
+                Node(this.key, this.value, newLeft, right).balance()
+            } else {
+                // key > this.key
+                val newRight = right?.set(key, value, comparator) ?: Node(
+                    key,
+                    value
+                )
+                Node(this.key, this.value, left, newRight).balance()
+            }
+        }
 
         private fun findNodeWithMinKey(): Node<K, V> {
             if (left == null) {
@@ -183,7 +180,6 @@ class ImmutableAVLTree<K, V>(
             }
             return left.findNodeWithMinKey()
         }
-
 
         private fun removeNodeWithMinKey(): Node<K, V>? {
             if (left == null) {
@@ -194,7 +190,6 @@ class ImmutableAVLTree<K, V>(
             return Node(key, value, newLeft, right).balance()
         }
 
-
         /**
          * Removes the entry with the following key
          * @param key of the entry that should be removed
@@ -202,27 +197,29 @@ class ImmutableAVLTree<K, V>(
          * @return new root of the subtree
          */
         fun remove(key: K, comparator: Comparator<K>): Node<K, V>? {
-            // key < this.key
-            if (comparator.compare(key, this.key) < 0) {
+            if (comparator.compare(key, this.key) == 0) {
+                // key == this.key
+                // this is the node that should be deleted
+                return if (right == null) {
+                    left
+                } else {
+                    val newRoot = right.findNodeWithMinKey()
+                    val newRight = right.removeNodeWithMinKey()
+
+                    Node(newRoot.key, newRoot.value, left, newRight).balance()
+                }
+            }
+
+            return if (comparator.compare(key, this.key) < 0) {
+                // key < this.key
                 val newLeft = left?.remove(key, comparator)
-                return Node(this.key, this.value, newLeft, right)
-            }
-            // key > this.key
-            if (comparator.compare(key, this.key) > 0) {
+                Node(this.key, this.value, newLeft, right)
+            } else {
+                // key > this.key
                 val newRight = right?.remove(key, comparator)
-                return Node(this.key, this.value, left, newRight)
+                Node(this.key, this.value, left, newRight)
             }
-            // key == this.key
-            // this is the node that should be deleted
-            if (right == null) {
-                return left
-            }
-            val newRoot = right.findNodeWithMinKey()
-            val newRight = right.removeNodeWithMinKey()
-
-            return Node(newRoot.key, newRoot.value, left, newRight).balance()
         }
-
 
         /**
          * Converts the following subtree to a list
@@ -241,13 +238,12 @@ class ImmutableAVLTree<K, V>(
         }
     }
 
-
     override fun containsKey(key: K): Boolean {
         return get(key) != null
     }
 
-
-    override fun containsValue(value: V): Boolean {
+    @Suppress("ReturnCount")
+    private fun breadthFirstSearch(valuePredicate: (value: V) -> Boolean): Boolean {
         if (root == null) {
             return false
         }
@@ -256,7 +252,7 @@ class ImmutableAVLTree<K, V>(
 
         while (!stack.empty()) {
             val curNode = stack.pop()
-            if (curNode.value == value) {
+            if (valuePredicate(curNode.value)) {
                 return true
             }
             if (curNode.left != null) {
@@ -269,16 +265,18 @@ class ImmutableAVLTree<K, V>(
         return false
     }
 
+    override fun containsValue(value: V): Boolean {
+        val equalityPredicate = { treeValue: V -> treeValue == value }
+        return breadthFirstSearch(equalityPredicate)
+    }
 
     override fun get(key: K): V? {
         return root?.get(key, comparator)
     }
 
-
     override fun isEmpty(): Boolean {
         return size == 0
     }
-
 
     /**
      * Puts a value in the AVLTree. (Like MutableMap.put)
@@ -298,7 +296,6 @@ class ImmutableAVLTree<K, V>(
         val newSize = if (!containsKey(key)) size + 1 else size
         return ImmutableAVLTree(comparator, newRoot, newSize)
     }
-
 
     /**
      * Removes the entry with the received [key]
