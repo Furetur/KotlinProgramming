@@ -1,8 +1,4 @@
-package hw1
-
-import iohelpers.safeParseInt
-import java.lang.Exception
-
+package homeworks.hw1
 
 fun <T> mutateReverse(list: MutableList<T>, startIndex: Int = 0, endIndex: Int = list.size - 1) {
     var left: Int = startIndex
@@ -16,7 +12,6 @@ fun <T> mutateReverse(list: MutableList<T>, startIndex: Int = 0, endIndex: Int =
     }
 }
 
-
 fun <T> mutateSwapListPartitions(list: MutableList<T>, partitionSize1: Int, partitionSize2: Int) {
     if (partitionSize1 + partitionSize2 != list.size) {
         throw IllegalArgumentException("Wrong partition sizes passed")
@@ -26,19 +21,11 @@ fun <T> mutateSwapListPartitions(list: MutableList<T>, partitionSize1: Int, part
     mutateReverse(list, partitionSize2, list.size - 1)
 }
 
-
 fun main() {
-    val partitionSize1: Int
-    val partitionSize2: Int
-
     println("Enter 2 partition sizes of your array:")
-    try {
-        partitionSize1 = safeParseInt(readLine())
-        partitionSize2 = safeParseInt(readLine())
-    } catch (e: Exception) {
-        println("Wrong input")
-        return
-    }
+
+    val partitionSize1: Int = readLine()?.toInt() ?: throw IllegalArgumentException("Expected a number")
+    val partitionSize2: Int = readLine()?.toInt() ?: throw IllegalArgumentException("Expected a number")
 
     println("Enter your array with spaces separating elements")
 
