@@ -36,6 +36,13 @@ internal class _4_1KtTest {
     }
 
     @Test
+    fun `should correctly parse empty files`() {
+        val file = File("./src/test/kotlin/homeworks/hw4/empty.txt")
+        val actualPairs = parseFileIntoPairs(file)
+        assertEquals(0, actualPairs.size)
+    }
+
+    @Test
     fun `put pairs should put entries`() {
         val hashTable = HashTable<String, String>(pearsonHash)
         val expectedPairs = mutableSetOf<Pair<String, String>>()
@@ -47,4 +54,6 @@ internal class _4_1KtTest {
         val actualPairs = hashTable.entries.map { entry -> Pair(entry.key, entry.value) }.toMutableSet()
         assertEquals(expectedPairs, actualPairs)
     }
+
+
 }
