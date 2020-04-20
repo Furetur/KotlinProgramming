@@ -33,7 +33,9 @@ private fun splitTwoOperands(twoOperands: String): List<String> {
         twoOperands.indexOfFirst { it == ' ' } - 1
     }
     if (firstOperandEnd == twoOperands.length - 1 || firstOperandEnd == -1) {
-        throw ExpressionTree.IllegalStringSyntax()
+        throw ExpressionTree.IllegalStringSyntax(
+            "Two operands expected but $twoOperands received. Check for unclosed parenthesis"
+        )
     }
 
     val firstOperand = twoOperands.substring(0, firstOperandEnd + 1)
@@ -51,13 +53,15 @@ private fun parseOperatorNode(str: String): ExpressionTree.OperatorNode {
 }
 
 private fun parseValueNode(str: String): ExpressionTree.ValueNode {
-    val numericalValue = str.toIntOrNull() ?: throw ExpressionTree.IllegalStringSyntax()
+    val numericalValue = str.toIntOrNull() ?: throw ExpressionTree.IllegalStringSyntax(
+        "Number expected but received $str"
+    )
     return ExpressionTree.ValueNode(numericalValue)
 }
 
 private fun parseNode(str: String): ExpressionTree.Node {
     if (str.isEmpty()) {
-        throw ExpressionTree.IllegalStringSyntax()
+        throw ExpressionTree.IllegalStringSyntax("Received empty expression")
     }
     return when {
         operatorNodeRegExp.matches(str) -> {
@@ -67,7 +71,10 @@ private fun parseNode(str: String): ExpressionTree.Node {
             parseValueNode(str)
         }
         else -> {
-            throw ExpressionTree.IllegalStringSyntax()
+            throw ExpressionTree.IllegalStringSyntax(
+                "Node expected but received $str " +
+                        "Example of node: (+ 1 2). Check for unclosed parenthesis and odd whitespaces"
+            )
         }
     }
 }

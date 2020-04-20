@@ -28,7 +28,7 @@ fun main() {
     val tree = try {
         parseExpressionTree(input)
     } catch (e: ExpressionTree.IllegalStringSyntax) {
-        println("Wrong syntax of $filename")
+        println("Wrong syntax of $filename:\n\t${e.message}")
         return
     }
 

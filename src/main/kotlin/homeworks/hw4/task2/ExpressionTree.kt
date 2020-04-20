@@ -6,7 +6,7 @@ val supportedOperators = listOf('+', '/', '-', '*')
 
 class ExpressionTree(private val root: Node) {
 
-    class IllegalStringSyntax : IllegalArgumentException()
+    class IllegalStringSyntax(override val message: String) : IllegalArgumentException()
 
     class UnsupportedOperatorException : IllegalArgumentException()
 
