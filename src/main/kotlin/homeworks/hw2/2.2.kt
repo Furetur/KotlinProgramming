@@ -1,18 +1,21 @@
 package homeworks.hw2
 
-import java.lang.IllegalArgumentException
-
 fun <T> distinctRight(list: List<T>): List<T> {
     return list.reversed().distinct().reversed()
 }
 
 fun main() {
     println("Enter list and the program will remove all duplicate elements leaving only right occurrences")
-    val inputList = readLine()?.split(' ') ?: throw IllegalArgumentException("Wrong input")
+    val inputList = readLine()?.split(' ')
+
+    if (inputList == null) {
+        println("A list should be provided")
+        return
+    }
+
     val inputListDistinct = distinctRight(inputList)
 
     println("List without duplicate elements")
-    for (element in inputListDistinct) {
-        print("$element ")
-    }
+    val outputStr = inputListDistinct.joinToString(" ")
+    println(outputStr)
 }

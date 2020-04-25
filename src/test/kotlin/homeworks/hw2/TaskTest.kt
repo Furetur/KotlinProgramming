@@ -3,7 +3,7 @@ package homeworks.hw2
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-internal class _2_2KtTest {
+internal class TaskTest {
     @Test
     fun `should not edit lists that already do not contain duplicate elements`() {
         val testList = listOf(1, 2, 3, 4, 5, 6)
