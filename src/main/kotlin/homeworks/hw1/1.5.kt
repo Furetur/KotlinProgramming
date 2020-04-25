@@ -3,17 +3,7 @@ package homeworks.hw1
 import java.io.File
 import java.io.FileNotFoundException
 
-const val DEFAULT_PATH_PREFIX = "./src/main/kotlin/homeworks/hw1"
-val notMeaningfulSymbols = listOf(' ', '\t', '\n')
-
-fun isMeaningful(str: String): Boolean {
-    for (char in str) {
-        if (!notMeaningfulSymbols.contains(char)) {
-            return true
-        }
-    }
-    return false
-}
+const val DEFAULT_FILE_PATH = "./src/main/kotlin/homeworks/hw1/file.txt"
 
 fun countMeaningfulStringsInFile(file: File): Int {
     if (!file.exists()) {
@@ -21,7 +11,7 @@ fun countMeaningfulStringsInFile(file: File): Int {
     }
     var meaningfulLinesCount = 0
     file.forEachLine {
-        if (isMeaningful(it)) {
+        if (it.isNotBlank()) {
             meaningfulLinesCount += 1
         }
     }
@@ -29,15 +19,12 @@ fun countMeaningfulStringsInFile(file: File): Int {
 }
 
 fun main() {
-    println("Enter filename and this will calculate number of meaningful lines")
-    val filename = readLine() ?: "file.txt"
-    val path = "$DEFAULT_PATH_PREFIX/$filename"
-    val file = File(path)
+    val file = File(DEFAULT_FILE_PATH)
 
     if (!file.exists()) {
-        println("File not found")
+        println("File $DEFAULT_FILE_PATH not found")
     } else {
         val numberOfMeaningfulLines = countMeaningfulStringsInFile(file)
-        println("There are $numberOfMeaningfulLines meaningful lines in $path")
+        println("There are $numberOfMeaningfulLines meaningful lines in $DEFAULT_FILE_PATH")
     }
 }

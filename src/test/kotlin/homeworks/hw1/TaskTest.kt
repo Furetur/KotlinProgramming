@@ -6,42 +6,7 @@ import org.junit.jupiter.api.fail
 import java.io.File
 import java.io.FileNotFoundException
 
-internal class _1_5KtTest {
-    @Test
-    fun `should consider empty line meaningless`() {
-        assert(!isMeaningful(""))
-    }
-
-    @Test
-    fun `should consider line that consists only of whitespaces meaningless`() {
-        assert(!isMeaningful("        "))
-    }
-
-    @Test
-    fun `should consider line that consists only of tabs meaningless`() {
-        assert(!isMeaningful("\t\t\t\t\t"))
-    }
-
-    @Test
-    fun `should consider line that consists only of whitespaces and tabs meaningless`() {
-        assert(!isMeaningful("   \t   \t   \t\t  \t"))
-    }
-    @Test
-    fun `should consider long line that consists only of whitespaces and tabs meaningless`() {
-        val line = "   \t   \t   \t\t  \t".repeat(100)
-        assert(!isMeaningful(line))
-    }
-
-    @Test
-    fun `should consider line that has meaningful symbol meaningful`() {
-        assert(isMeaningful("   \t   \t a  \t\t  \t"))
-    }
-    @Test
-    fun `should consider long line that has meaningful symbol meaningful`() {
-        val line = "   \t   \t   \t\t  \t".repeat(100) + "s"
-        assert(isMeaningful(line))
-    }
-
+internal class TaskTest {
     @Test
     fun `should work for empty files`() {
         val emptyFile = File("./src/test/kotlin/homeworks/hw1/emptytest.txt")
@@ -69,11 +34,8 @@ internal class _1_5KtTest {
     @Test
     fun `should throw FileNotFoundException if file does not exist`() {
         val file = File("doesnotexist")
-        try {
+        assertThrows(FileNotFoundException::class.java) {
             countMeaningfulStringsInFile(file)
-            fail("Should throw")
-        } catch (e: FileNotFoundException) {
-            // success
         }
     }
 }
