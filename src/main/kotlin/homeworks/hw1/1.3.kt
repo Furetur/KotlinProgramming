@@ -2,7 +2,7 @@ package homeworks.hw1
 
 import java.lang.IllegalArgumentException
 
-fun countSubstringOccurences(parentString: String, childString: String): Int {
+fun countSubstringOccurrences(parentString: String, childString: String): Int {
     if (childString == "") {
         throw IllegalArgumentException("childString can not be an empty string")
     }
@@ -32,8 +32,10 @@ fun main() {
         return
     }
 
-    println("Child string occurs in the parent string ${countSubstringOccurences(
-        parentString,
-        childString
-    )} time(s)")
+    try {
+        val occurrences = countSubstringOccurrences(parentString, childString)
+        println("Child string occurs in the parent string $occurrences time(s)")
+    } catch (e: IllegalArgumentException) {
+        println("The second string cannot be empty")
+    }
 }
