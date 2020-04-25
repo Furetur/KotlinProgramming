@@ -1,7 +1,5 @@
 package homeworks.hw2
 
-import java.lang.IllegalArgumentException
-
 const val X_LENGTH = 3
 val CONSECUTIVE_X_REGEX = Regex("x+")
 
@@ -27,8 +25,15 @@ fun howManyCharactersNeedToBeRemoved(str: String): Int {
 
 fun main() {
     println("Enter your string and we will determine how many characters need to be removed to delete that naughty XXX")
-    val inputString = readLine() ?: throw IllegalArgumentException("Wrong input")
+    val inputString = readLine()
+
+    if (inputString == null) {
+        println("A string should be provided")
+        return
+    }
+
     val charactersToBeRemovedCount = howManyCharactersNeedToBeRemoved(inputString)
 
     println("$charactersToBeRemovedCount character(s) need to be removed")
+    return
 }

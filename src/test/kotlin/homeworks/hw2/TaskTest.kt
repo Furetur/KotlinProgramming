@@ -3,9 +3,9 @@ package homeworks.hw2
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-internal class _2_1KtTest {
+internal class TaskTest {
 
-    fun sequenceOfMatchResultsToSetOfStrings(sequence: Sequence<MatchResult>): Set<String> {
+    private fun sequenceOfMatchResultsToSetOfStrings(sequence: Sequence<MatchResult>): Set<String> {
         return sequence.toSet().map { it.value }.toSet()
     }
 
@@ -82,6 +82,22 @@ internal class _2_1KtTest {
         var str = ""
         var curX = "x"
         for (i in 0..100) {
+            str += " $curX"
+            if (curX.length >= 3) {
+                expected += curX.length - 2
+            }
+            curX += "x"
+        }
+
+        assertEquals(expected, howManyCharactersNeedToBeRemoved(str))
+    }
+
+    @Test
+    fun `should consider every xxx in big test`() {
+        var expected = 0
+        var str = ""
+        var curX = "x"
+        for (i in 0..1000) {
             str += " $curX"
             if (curX.length >= 3) {
                 expected += curX.length - 2
