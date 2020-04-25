@@ -1,22 +1,16 @@
 package homeworks.hw1
 
-import homeworks.hw1.factorialIterative
-import homeworks.hw1.factorialRecursive
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.fail
 import java.lang.IllegalArgumentException
 
-internal class _1_2KtTest {
+internal class TaskTest {
 
     @Test
     fun factorialIterative_throwsExceptionOnNegativeNumbers() {
-        try {
+        assertThrows(IllegalArgumentException::class.java) {
             factorialIterative(-1)
-            fail("Expected an IllegalArgumentException to be thrown")
-        } catch (e: IllegalArgumentException) {
-            return
         }
     }
 
@@ -48,11 +42,8 @@ internal class _1_2KtTest {
 
     @Test
     fun factorialRecursive_throwsExceptionOnNegativeNumbers() {
-        try {
+        assertThrows(IllegalArgumentException::class.java) {
             factorialRecursive(-1)
-            fail("Expected an IllegalArgumentException to be thrown")
-        } catch (e: IllegalArgumentException) {
-            return
         }
     }
 

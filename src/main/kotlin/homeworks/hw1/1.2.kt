@@ -38,11 +38,11 @@ fun main() {
 
     try {
         inputNumber = inputString.toInt()
+        println("Factorial calculated iteratively: ${factorialIterative(inputNumber)}")
+        println("Factorial calculated recursively: ${factorialRecursive(inputNumber)}")
     } catch (e: NumberFormatException) {
         println("The string you entered is not a number")
-        return
+    } catch (e: IllegalArgumentException) {
+        println(e.message)
     }
-
-    println("Factorial calculated iteratively: ${factorialIterative(inputNumber)}")
-    println("Factorial calculated recursively: ${factorialRecursive(inputNumber)}")
 }
