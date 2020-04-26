@@ -1,8 +1,8 @@
 package homeworks.hw3
 
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 
 val emptyTree = ImmutableAVLTree<String, Int>(Comparator<String> { str1, str2 ->
     str1.compareTo(str2)
@@ -20,11 +20,11 @@ internal class ImmutableAVLTreeTest {
     fun getEntries_shouldReturnAllEntriesForPopulatedTree() {
         val actualEntries = populatedTree.entries
         val expectedEntriesStrings = setOf(
-            ImmutableAVLTree.Entry("a", 1),
-            ImmutableAVLTree.Entry("b", 2),
-            ImmutableAVLTree.Entry("c", 4),
-            ImmutableAVLTree.Entry("d", 3),
-            ImmutableAVLTree.Entry("e", 5)
+            ImmutableAVLTree.Node("a", 1),
+            ImmutableAVLTree.Node("b", 2),
+            ImmutableAVLTree.Node("c", 4),
+            ImmutableAVLTree.Node("d", 3),
+            ImmutableAVLTree.Node("e", 5)
         ).map { it.toString() }
         val actualEntriesStrings = actualEntries.map { it.toString() }
         assert(
@@ -74,7 +74,7 @@ internal class ImmutableAVLTreeTest {
 
     @Test
     fun containsKey_shouldReturnFalseForKeysNotInTree() {
-        assert(!populatedTree.contains("n"))
+        assertFalse(populatedTree.contains("n"))
     }
 
     @Test
@@ -84,7 +84,7 @@ internal class ImmutableAVLTreeTest {
 
     @Test
     fun containsValue_shouldReturnFalseForValuesNotInTree() {
-        assert(!populatedTree.containsValue(10))
+        assertFalse(populatedTree.containsValue(10))
     }
 
     @Test
@@ -109,7 +109,7 @@ internal class ImmutableAVLTreeTest {
 
     @Test
     fun isEmpty_shouldReturnFalseForPopulatedTree() {
-        assert(!populatedTree.isEmpty())
+        assertFalse(populatedTree.isEmpty())
     }
 
     @Test
@@ -167,40 +167,41 @@ internal class ImmutableAVLTreeTest {
     }
 
     @Test
-    fun get_shouldReadValuesFromBigTrees1() {
-        val intComparator = Comparator<Int>{num1, num2 -> num1 - num2}
+    fun `should store all given key value pairs`() {
+        val intComparator = Comparator<Int> { num1, num2 -> num1 - num2 }
         var newTree = ImmutableAVLTree<Int, Int>(intComparator)
-        for (i in 0..1000) {
+        val expectedEntries = mutableSetOf<Pair<Int, Int>>()
+        for (i in 0..100) {
             newTree = newTree.put(i, i)
+            expectedEntries.add(Pair(i, i))
         }
-        for (i in 0..1000) {
-            assertEquals(i, newTree[i])
-        }
+        val actualEntriesAsPairs = newTree.entries.map { Pair(it.key, it.value) }.toSet()
+        assertEquals(expectedEntries.toSet(), actualEntriesAsPairs)
     }
 
     @Test
     fun containsKey_shouldReturnFalseForValuesNotInBigTree() {
-        val intComparator = Comparator<Int>{num1, num2 -> num1 - num2}
+        val intComparator = Comparator<Int> { num1, num2 -> num1 - num2 }
         var newTree = ImmutableAVLTree<Int, Int>(intComparator)
         for (i in 0..1000) {
             newTree = newTree.put(i, i)
         }
-        assert(!newTree.containsKey(10000))
+        assertFalse(newTree.containsKey(10000))
     }
 
     @Test
     fun containsValue_shouldReturnFalseForValuesNotInBigTree() {
-        val intComparator = Comparator<Int>{num1, num2 -> num1 - num2}
+        val intComparator = Comparator<Int> { num1, num2 -> num1 - num2 }
         var newTree = ImmutableAVLTree<Int, String>(intComparator)
         for (i in 0..1000) {
             newTree = newTree.put(i, "value=$i")
         }
-        assert(!newTree.containsValue("value=100000"))
+        assertFalse(newTree.containsValue("value=100000"))
     }
 
     @Test
     fun containsValue_shouldReturnTrueForValuesInBigTree() {
-        val intComparator = Comparator<Int>{num1, num2 -> num1 - num2}
+        val intComparator = Comparator<Int> { num1, num2 -> num1 - num2 }
         var newTree = ImmutableAVLTree<Int, String>(intComparator)
         for (i in 0..1000) {
             newTree = newTree.put(i, "value=$i")

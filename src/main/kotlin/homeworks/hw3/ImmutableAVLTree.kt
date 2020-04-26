@@ -24,7 +24,7 @@ class ImmutableAVLTree<K, V>(
 ) : Map<K, V> {
 
     override val entries: Set<Map.Entry<K, V>>
-        get() = root?.flatten()?.toSet() ?: setOf()
+        get() = root?.asSequence()?.toSet() ?: setOf()
 
     override val keys: Set<K>
         get() = entries.map { entry -> entry.key }.toSet()
@@ -36,21 +36,21 @@ class ImmutableAVLTree<K, V>(
         get() = entries.map { entry -> entry.value }
 
     /**
-     * A basic implementation of Map.Entry
-     */
-    class Entry<K, V>(override val key: K, override val value: V) : Map.Entry<K, V> {
-        override fun toString(): String {
-            return "($key, $value)"
-        }
-    }
-
-    /**
-     * Node of the ImmutableAVLTree
+     * Node of the ImmutableAVLTree, which is an entry of this tree
      * @param K type of the node's key
      * @param V type of the node's value
      * @constructor Creates a node and sets its left and right children
      */
-    class Node<K, V>(val key: K, val value: V, val left: Node<K, V>? = null, val right: Node<K, V>? = null) {
+    class Node<K, V>(
+        override val key: K,
+        override val value: V,
+        val left: Node<K, V>? = null,
+        val right: Node<K, V>? = null
+    ) : Iterable<Node<K, V>>, Map.Entry<K, V> {
+
+        private val children: List<Node<K, V>>
+            get() = listOfNotNull(left, right)
+
         private val leftHeight: Int
             get() = left?.height ?: 0
         private val rightHeight: Int
@@ -221,20 +221,23 @@ class ImmutableAVLTree<K, V>(
             }
         }
 
-        /**
-         * Converts the following subtree to a list
-         */
-        fun flatten(): MutableList<Map.Entry<K, V>> {
-            val resultList = mutableListOf<Map.Entry<K, V>>()
-            val leftPart = left?.flatten() ?: mutableListOf()
-            val rightPart = right?.flatten() ?: mutableListOf()
-            val currentMapEntry: Map.Entry<K, V> = Entry(key, value)
+        override fun iterator(): Iterator<Node<K, V>> {
+            val stack = Stack<Node<K, V>>()
+            stack.push(this)
 
-            resultList.addAll(leftPart)
-            resultList.add(currentMapEntry)
-            resultList.addAll(rightPart)
+            return sequence<Node<K, V>> {
+                while (stack.isNotEmpty()) {
+                    val curNode = stack.pop()
+                    for (child in curNode.children) {
+                        stack.push(child)
+                    }
+                    yield(Node(curNode.key, curNode.value))
+                }
+            }.iterator()
+        }
 
-            return resultList
+        override fun toString(): String {
+            return "($key, $value)"
         }
     }
 
@@ -242,32 +245,8 @@ class ImmutableAVLTree<K, V>(
         return get(key) != null
     }
 
-    @Suppress("ReturnCount")
-    private fun breadthFirstSearch(valuePredicate: (value: V) -> Boolean): Boolean {
-        if (root == null) {
-            return false
-        }
-        val stack = Stack<Node<K, V>>()
-        stack.push(root)
-
-        while (!stack.empty()) {
-            val curNode = stack.pop()
-            if (valuePredicate(curNode.value)) {
-                return true
-            }
-            if (curNode.left != null) {
-                stack.push(curNode.left)
-            }
-            if (curNode.right != null) {
-                stack.push(curNode.right)
-            }
-        }
-        return false
-    }
-
     override fun containsValue(value: V): Boolean {
-        val equalityPredicate = { treeValue: V -> treeValue == value }
-        return breadthFirstSearch(equalityPredicate)
+        return this.entries.any { it.value == value }
     }
 
     override fun get(key: K): V? {
