@@ -2,10 +2,12 @@ package homeworks.hw4.task2
 
 import java.lang.IllegalArgumentException
 
-val operatorNodeRegExp = Regex("^[(]([+]|[-]|[*]|[/]) .+ .+[)]$")
-val valueNodeRegex = Regex("^[0-9]+$")
+val operatorNodeRegExp = Regex("^[(]. .+ .+[)]$")
+val numberRegex = Regex("^[-]?[0-9]*[.|,]?[0-9]+\$")
 
 const val FIRST_OPERAND_START_INDEX = 3
+
+class IllegalStringSyntax(override val message: String) : IllegalArgumentException()
 
 private fun findEndOfParenthesisSequence(str: String): Int {
     if (str[0] != '(') {
@@ -33,8 +35,9 @@ private fun splitTwoOperands(twoOperands: String): List<String> {
         twoOperands.indexOfFirst { it == ' ' } - 1
     }
     if (firstOperandEnd == twoOperands.length - 1 || firstOperandEnd == -1) {
-        throw ExpressionTree.IllegalStringSyntax(
-            "Two operands expected but $twoOperands received. Check for unclosed parenthesis"
+        throw IllegalStringSyntax(
+            "\"<integer or node> <integer or node>\" expected but \"$twoOperands\" received. " +
+                    "Check for unclosed parenthesis and odd whitespaces"
         )
     }
 
@@ -53,27 +56,30 @@ private fun parseOperatorNode(str: String): ExpressionTree.OperatorNode {
 }
 
 private fun parseValueNode(str: String): ExpressionTree.ValueNode {
-    val numericalValue = str.toIntOrNull() ?: throw ExpressionTree.IllegalStringSyntax(
-        "Number expected but received $str"
+    val numericalValue = str.toIntOrNull() ?: throw IllegalStringSyntax(
+        "Integer (whole number) expected but received \"$str\""
     )
     return ExpressionTree.ValueNode(numericalValue)
 }
 
 private fun parseNode(str: String): ExpressionTree.Node {
     if (str.isEmpty()) {
-        throw ExpressionTree.IllegalStringSyntax("Received empty expression")
+        throw IllegalStringSyntax("Received empty node")
     }
     return when {
         operatorNodeRegExp.matches(str) -> {
             parseOperatorNode(str)
         }
-        valueNodeRegex.matches(str) -> {
+        numberRegex.matches(str) -> {
             parseValueNode(str)
         }
         else -> {
-            throw ExpressionTree.IllegalStringSyntax(
-                "Node expected but received $str " +
-                        "Example of node: (+ 1 2). Check for unclosed parenthesis and odd whitespaces"
+            throw IllegalStringSyntax(
+                "Node or integer expected but received \"$str\"\n" +
+                        "\tCheck for unclosed parenthesis and odd whitespaces\n" +
+                        "\tNodes should look like " +
+                        "\"(<one character operator> <integer or node> <integer or node>)\"\n" +
+                        "\tExample of node: (+ 1 2). Check for unclosed parenthesis and odd whitespaces"
             )
         }
     }

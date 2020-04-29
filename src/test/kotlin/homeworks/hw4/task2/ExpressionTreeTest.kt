@@ -1,7 +1,9 @@
 package homeworks.hw4.task2
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 internal class ExpressionTreeTest {
     @Test
@@ -91,6 +93,15 @@ internal class ExpressionTreeTest {
     @Test
     fun `OperatorNode should eval big tree with one division`() {
         assertEquals(2.0, buildTreeResultingInTwo(10).evaluate())
+    }
+
+    @Test
+    fun `OperatorNode should throw if given unsupported operator`() {
+        assertThrows(ExpressionTree.UnsupportedOperatorException::class.java) {
+            ExpressionTree.OperatorNode(
+                '&', ExpressionTree.ValueNode(1), ExpressionTree.ValueNode(2)
+            )
+        }
     }
 
     private fun buildTreeResultingInHalf(height: Int): ExpressionTree.OperatorNode {

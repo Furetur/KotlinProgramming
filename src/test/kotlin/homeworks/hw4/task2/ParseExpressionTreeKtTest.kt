@@ -1,8 +1,8 @@
 package homeworks.hw4.task2
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.fail
 
 internal class ParseExpressionTreeKtTest {
 
@@ -47,6 +47,7 @@ internal class ParseExpressionTreeKtTest {
             )
         }
     }
+
     @Test
     fun `should parse 1 + 2`() {
         val input = "(+ 1 2)"
@@ -77,153 +78,167 @@ internal class ParseExpressionTreeKtTest {
 
     @Test
     fun `should parse generated big sum`() {
-        val input = buildSum(10).toString()
+        val sum = buildSum(10)
+        val input = sum.toString()
         val tree = parseExpressionTree(input)
-        assertEquals(1024.0, tree.evaluate())
+        val expected = ExpressionTree(sum)
+        assertEquals(expected, tree)
     }
 
     @Test
     fun `should parse generated super big sum`() {
-        val input = buildSuperSum(10).toString()
+        val sum = buildSuperSum(10)
+        val input = sum.toString()
         val tree = parseExpressionTree(input)
-        assertEquals(1024.0, tree.evaluate())
+        val expected = ExpressionTree(sum)
+        assertEquals(expected, tree)
     }
 
     @Test
     fun `should parse a number`() {
         val input = "178"
         val tree = parseExpressionTree(input)
-        assertEquals(178.0, tree.evaluate())
+        val expected = ExpressionTree(ExpressionTree.ValueNode(178))
+        assertEquals(expected, tree)
     }
 
     @Test
     fun `should throw if value node is written with not only numbers`() {
-        try {
+        assertThrows(IllegalStringSyntax::class.java) {
             parseExpressionTree("112.0")
-            fail("Should throw IllegalStringSyntax")
-        } catch (e: ExpressionTree.IllegalStringSyntax) {
-            // success
         }
     }
 
     @Test
     fun `should throw if operator node has a missing parenthesis`() {
-        try {
+        assertThrows(IllegalStringSyntax::class.java) {
             parseExpressionTree("(+ 1 2")
-            fail("Should throw IllegalStringSyntax")
-        } catch (e: ExpressionTree.IllegalStringSyntax) {
-            // success
         }
     }
 
     @Test
     fun `should throw if operator node missing parenthesis`() {
-        try {
+        assertThrows(IllegalStringSyntax::class.java) {
             parseExpressionTree("+ 1 2")
-            fail("Should throw IllegalStringSyntax")
-        } catch (e: ExpressionTree.IllegalStringSyntax) {
-            // success
         }
     }
 
     @Test
     fun `should throw if operator node has less than 2 operands`() {
-        try {
+        assertThrows(IllegalStringSyntax::class.java) {
             parseExpressionTree("(+ 1)")
-            fail("Should throw IllegalStringSyntax")
-        } catch (e: ExpressionTree.IllegalStringSyntax) {
-            // success
         }
     }
 
     @Test
     fun `should throw if operator node has more than 2 operands`() {
-        try {
+        assertThrows(IllegalStringSyntax::class.java) {
             parseExpressionTree("(+ 1 2 3 4)")
-            fail("Should throw IllegalStringSyntax")
-        } catch (e: ExpressionTree.IllegalStringSyntax) {
-            // success
         }
     }
 
     @Test
     fun `should throw if operator node has any symbols around it 1`() {
-        try {
+        assertThrows(IllegalStringSyntax::class.java) {
             parseExpressionTree(" (+ 1 2 3 4)")
-            fail("Should throw IllegalStringSyntax")
-        } catch (e: ExpressionTree.IllegalStringSyntax) {
-            // success
         }
     }
 
     @Test
     fun `should throw if operator node has any symbols around it 2`() {
-        try {
+        assertThrows(IllegalStringSyntax::class.java) {
             parseExpressionTree("(+ 1 2 3 4)  ")
-            fail("Should throw IllegalStringSyntax")
-        } catch (e: ExpressionTree.IllegalStringSyntax) {
-            // success
         }
     }
 
     @Test
     fun `should throw if operator node has unsupported operation 1`() {
-        try {
+        assertThrows(ExpressionTree.UnsupportedOperatorException::class.java) {
             parseExpressionTree("(. 1 2)")
-            fail("Should throw IllegalStringSyntax")
-        } catch (e: ExpressionTree.IllegalStringSyntax) {
-            // success
         }
     }
 
     @Test
     fun `should throw if operator node has unsupported operation 2`() {
-        try {
+        assertThrows(ExpressionTree.UnsupportedOperatorException::class.java) {
             parseExpressionTree("(| 1 2)")
-            fail("Should throw IllegalStringSyntax")
-        } catch (e: ExpressionTree.IllegalStringSyntax) {
-            // success
         }
     }
 
     @Test
     fun `should throw if first operand is illegal`() {
-        try {
+        assertThrows(IllegalStringSyntax::class.java) {
             parseExpressionTree("(+ (+ 2)")
-            fail("Should throw IllegalStringSyntax")
-        } catch (e: ExpressionTree.IllegalStringSyntax) {
-            // success
         }
     }
 
     @Test
     fun `should throw if first operand is empty`() {
-        try {
+        assertThrows(IllegalStringSyntax::class.java) {
             parseExpressionTree("(+ () 2)")
-            fail("Should throw IllegalStringSyntax")
-        } catch (e: ExpressionTree.IllegalStringSyntax) {
-            // success
+        }
+    }
+
+    @Test
+    fun `should throw if node is empty`() {
+        assertThrows(IllegalStringSyntax::class.java) {
+            parseExpressionTree("()")
+        }
+    }
+
+    @Test
+    fun `should if neither node nor integer is provided`() {
+        assertThrows(IllegalStringSyntax::class.java) {
+            parseExpressionTree("wqe")
         }
     }
 
     @Test
     fun `should throw if second operand is empty`() {
-        try {
+        assertThrows(IllegalStringSyntax::class.java) {
             parseExpressionTree("(+ 1 ())")
-            fail("Should throw IllegalStringSyntax")
-        } catch (e: ExpressionTree.IllegalStringSyntax) {
-            // success
         }
     }
 
     @Test
     fun `should throw if second operand is illegal`() {
-        try {
+        assertThrows(IllegalStringSyntax::class.java) {
             parseExpressionTree("(+ 1 (+ 10))")
-            fail("Should throw IllegalStringSyntax")
-        } catch (e: ExpressionTree.IllegalStringSyntax) {
-            // success
         }
     }
 
+    private fun replaceDeeplyNested(bigString: String, oldStr: String, newStr: String): String {
+        val newMiddle = bigString.substring(200, 300).replace(oldStr, newStr)
+        return bigString.substring(0, 200) + newMiddle + bigString.substring(300)
+    }
+
+    @Test
+    fun `should throw if deeply nested numbers is not an integer`() {
+        val expected = buildSum(10)
+        val input = expected.toString()
+        val replacedInput = replaceDeeplyNested(input, "1", "1.0")
+        assertThrows(IllegalStringSyntax::class.java) {
+            parseExpressionTree(replacedInput)
+        }
+    }
+
+    @Test
+    fun `should throw if deeply nested nodes do not have parenthesis`() {
+        val expected = buildSum(10)
+        val input = expected.toString()
+        val replacedInput = replaceDeeplyNested(input, "(", "")
+        assertThrows(IllegalStringSyntax::class.java) {
+            parseExpressionTree(replacedInput)
+        }
+    }
+
+    @Test
+    fun `should throw if deeply nested nodes have missing whitespaces`() {
+        val expected = buildSum(10)
+        val input = expected.toString()
+        val replacedInput = replaceDeeplyNested(input, " ", "")
+        assertThrows(IllegalStringSyntax::class.java) {
+            parseExpressionTree(replacedInput)
+        }
+    }
 }
