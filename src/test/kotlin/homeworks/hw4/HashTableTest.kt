@@ -1,6 +1,8 @@
 package homeworks.hw4
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -25,7 +27,7 @@ internal class HashTableTest {
     @Test
     fun `should not be empty after putting keys`() {
         hashTable["k"] = "v"
-        assert(!hashTable.isEmpty())
+        assertFalse(hashTable.isEmpty())
     }
 
     @Test
@@ -132,7 +134,7 @@ internal class HashTableTest {
     @Test
     fun `containsKey should return false if key was not put`() {
         hashTable["key"] = "val"
-        assert(!hashTable.containsKey("key1"))
+        assertFalse(hashTable.containsKey("key1"))
     }
 
     @Test
@@ -144,7 +146,7 @@ internal class HashTableTest {
     @Test
     fun `containsValue should return false if value was not put`() {
         hashTable["key"] = "val"
-        assert(!hashTable.containsValue("val1"))
+        assertFalse(hashTable.containsValue("val1"))
     }
 
     @Test
@@ -181,6 +183,16 @@ internal class HashTableTest {
             actualValues.add(hashTable["key$i"] ?: "null")
         }
         assertEquals(expectedValues, actualValues)
+    }
+
+    @Test
+    fun `changing a hash function should reorganize the table`() {
+        for (i in 0..1000) {
+            hashTable["key$i"] = "val$i"
+        }
+        val oldLoadFactor = hashTable.loadFactor
+        hashTable.hashFunction = trivialHash
+        assertNotEquals(oldLoadFactor, hashTable.loadFactor)
     }
 
     @Test

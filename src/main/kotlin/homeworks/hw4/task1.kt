@@ -1,24 +1,6 @@
 package homeworks.hw4
 
-import java.io.File
-import java.io.FileNotFoundException
 import java.lang.IllegalArgumentException
-
-fun parseFileIntoPairs(file: File): MutableList<Pair<String, String>> {
-    val pairs = mutableListOf<Pair<String, String>>()
-    try {
-        file.forEachLine {
-            val parsedLine = it.split(':')
-            val key = parsedLine[0].trim()
-            val value = parsedLine[1].trim()
-            val newPair = Pair(key, value)
-            pairs.add(newPair)
-        }
-    } catch (e: FileNotFoundException) {
-        throw e
-    }
-    return pairs
-}
 
 fun <K, V> putPairsIntoHashTable(hashTable: HashTable<K, V>, pairs: List<Pair<K, V>>) {
     for (pair in pairs) {
@@ -52,7 +34,7 @@ fun main() {
         lastOutput = try {
             runInteractiveCommand(hashTable, command)
         } catch (e: IllegalArgumentException) {
-            e.message ?: ""
+            "Error: " + (e.message ?: "")
         }
         println("> $lastOutput")
     }
