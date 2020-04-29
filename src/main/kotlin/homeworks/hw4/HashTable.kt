@@ -2,7 +2,7 @@ package homeworks.hw4
 
 import java.lang.IllegalArgumentException
 
-class HashTable<K, V>(hashFunction: (K) -> Int, private val tableSize: Int = 3) : MutableMap<K, V> {
+class HashTable<K, V>(hashFunction: (K) -> Int, private val tableSize: Int = 51) : MutableMap<K, V> {
 
     class HashTableEntry<K, V>(override val key: K, value: V) : MutableMap.MutableEntry<K, V> {
         override val value: V
