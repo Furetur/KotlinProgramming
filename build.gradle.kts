@@ -20,6 +20,7 @@ dependencies {
     implementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     implementation("org.junit.jupiter:junit-jupiter-engine:5.6.0")
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.5")
 }
 
 detekt {
@@ -38,4 +39,3 @@ tasks {
         useJUnitPlatform()
     }
 }
-
