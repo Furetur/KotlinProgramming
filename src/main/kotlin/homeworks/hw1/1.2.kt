@@ -34,10 +34,8 @@ fun main() {
         return
     }
 
-    val inputNumber: Int
-
     try {
-        inputNumber = inputString.toInt()
+        val inputNumber = inputString.toInt()
         println("Factorial calculated iteratively: ${factorialIterative(inputNumber)}")
         println("Factorial calculated recursively: ${factorialRecursive(inputNumber)}")
     } catch (e: NumberFormatException) {
