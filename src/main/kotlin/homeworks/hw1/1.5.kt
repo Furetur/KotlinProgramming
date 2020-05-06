@@ -9,13 +9,10 @@ fun countMeaningfulStringsInFile(file: File): Int {
     if (!file.exists()) {
         throw FileNotFoundException()
     }
-    var meaningfulLinesCount = 0
-    file.forEachLine {
-        if (it.isNotBlank()) {
-            meaningfulLinesCount += 1
-        }
+
+    return file.useLines { lines ->
+        lines.count { it.isNotBlank() }
     }
-    return meaningfulLinesCount
 }
 
 fun main() {
