@@ -12,12 +12,12 @@ internal class ImmutableAVLTreeTest {
     private val populatedTree = emptyTree.put("a", 1).put("b", 2).put("c", 4).put("d", 3).put("e", 5)
 
     @Test
-    fun getEntries_shouldReturnAnEmptySetForEmptyTree() {
+    fun `entries should be empty if tree is empty`() {
         assertEquals(0, emptyTree.entries.size)
     }
 
     @Test
-    fun getEntries_shouldReturnAllEntriesForPopulatedTree() {
+    fun `entries should return all entries of the populated tree`() {
         val actualEntries = populatedTree.entries
         val expectedEntriesStrings = setOf(
             ImmutableAVLTree.Node("a", 1),
@@ -35,136 +35,144 @@ internal class ImmutableAVLTreeTest {
     }
 
     @Test
-    fun getKeys_shouldReturnEmptySetForEmptyTree() {
+    fun `keys should be an empty set for empty tree`() {
         assertEquals(0, emptyTree.keys.size)
     }
 
     @Test
-    fun getKeys_shouldReturnAllKeysOfPopulatedTree() {
+    fun `keys should return all put keys`() {
         val expectedKeys = setOf("a", "b", "c", "d", "e")
         assertEquals(expectedKeys, populatedTree.keys)
     }
 
     @Test
-    fun getSize_shouldReturnCorrectZeroForEmptyTree() {
+    fun `size of empty tree should be 0`() {
         assertEquals(0, emptyTree.size)
     }
 
     @Test
-    fun getSize_shouldReturnCorrectSizeForPopulatedTree() {
+    fun `size of populated tree should be equal to number of put items`() {
         assertEquals(5, populatedTree.size)
     }
 
     @Test
-    fun getValues_shouldReturnEmptySetForEmptyTree() {
+    fun `values should be empty if tree is empty`() {
         assertEquals(0, emptyTree.values.size)
     }
 
     @Test
-    fun getValues_shouldReturnCorrectSetForPopulatedTree() {
+    fun `values should contain all put values`() {
         val actualValues = populatedTree.values
         val expectedValues = setOf(1, 2, 3, 4, 5)
         assert(expectedValues.containsAll(actualValues) && actualValues.containsAll(expectedValues))
     }
 
     @Test
-    fun containsKey_shouldReturnTrueForKeysInTree() {
+    fun `contains should return true for keys that are in tree`() {
         assert(populatedTree.contains("d"))
     }
 
     @Test
-    fun containsKey_shouldReturnFalseForKeysNotInTree() {
+    fun `contains should return false for keys that are not in tree`() {
         assertFalse(populatedTree.contains("n"))
     }
 
     @Test
-    fun containsValue_shouldReturnTrueForValuesInTree() {
+    fun `contains value should return true for values that are in tree`() {
         assert(populatedTree.containsValue(1))
     }
 
     @Test
-    fun containsValue_shouldReturnFalseForValuesNotInTree() {
+    fun `contains value should return false for values that are not in tree`() {
         assertFalse(populatedTree.containsValue(10))
     }
 
     @Test
-    fun get_shouldReturnCorrectValuesForKeysInTree() {
+    fun `get should return correct value for key`() {
         assertEquals(4, populatedTree["c"])
     }
 
     @Test
-    fun get_shouldReturnNullForKeysNotInTree() {
+    fun `get should return null if key is not in tree`() {
         assertEquals(null, populatedTree["ab"])
     }
 
     @Test
-    fun get_shouldReturnNullForEmptyTree() {
+    fun `get should always return null if tree is empty`() {
         assertEquals(null, emptyTree["a"])
     }
 
     @Test
-    fun isEmpty_shouldReturnTrueForEmptyTree() {
+    fun `isEmpty should return true if tree is empty`() {
         assert(emptyTree.isEmpty())
     }
 
     @Test
-    fun isEmpty_shouldReturnFalseForPopulatedTree() {
+    fun `isEmpty should return false if tree is not empty`() {
         assertFalse(populatedTree.isEmpty())
     }
 
     @Test
-    fun put_shouldSaveNewGettableValueInEmptyTree() {
+    fun `values that are put into empty tree should be gettable`() {
         val newTree = emptyTree.put("a", 1)
         assertEquals(1, newTree["a"])
     }
 
     @Test
-    fun put_shouldSaveNewGettableValueInPopulatedTree() {
+    fun `values that are put into populated tree should be gettable`() {
         val newTree = populatedTree.put("abb", 123)
         assertEquals(123, newTree["abb"])
     }
 
     @Test
-    fun put_shouldIncreaseTreesSizeByOne() {
+    fun `put should increate tree size by 1`() {
         val newTree = populatedTree.put("132", 132)
         assertEquals(populatedTree.size + 1, newTree.size)
     }
 
     @Test
-    fun put_shouldUpdateExistingEntries() {
+    fun `put should update existing entries if key is already in tree`() {
         val newTree = emptyTree.put("a", 1).put("a", 2)
         assertEquals(2, newTree["a"])
     }
 
     @Test
-    fun remove_shouldRemoveExistingKeys() {
+    fun `remove should remove existing keys`() {
         val newTree = populatedTree.remove("b")
         assertEquals(null, newTree["b"])
     }
 
     @Test
-    fun remove_shouldNotRemoveKeysThatDoNotExist() {
+    fun `remove should do nothing if requested to remove an unexisting key`() {
         val newTree = populatedTree.remove("aab")
         assertEquals(null, newTree["aab"])
     }
 
     @Test
-    fun remove_shouldNotRemoveAnythingForEmptyTrees() {
+    fun `remove should do nothing on empty trees`() {
         val newTree = emptyTree.remove("1")
         assertEquals(null, newTree["1"])
     }
 
     @Test
-    fun remove_shouldDecreaseSizeByOneInPopulatedTree() {
+    fun `remove should decrease size by 1 in populated tree`() {
         val newTree = populatedTree.remove("a")
         assertEquals(populatedTree.size - 1, newTree.size)
     }
 
     @Test
-    fun remove_shouldNotChangeSizeOfEmptyTree() {
+    fun `remove should not change size if key is not present`() {
+        val newTree = populatedTree.remove("zyx")
+        assertEquals(populatedTree.size, newTree.size)
+    }
+
+    @Test
+    fun `remove should not change size of empty tree`() {
         val newTree = emptyTree.remove("a")
         assertEquals(0, newTree.size)
     }
+
+    // big tests
 
     @Test
     fun `should store all given key value pairs`() {
@@ -180,7 +188,7 @@ internal class ImmutableAVLTreeTest {
     }
 
     @Test
-    fun containsKey_shouldReturnFalseForValuesNotInBigTree() {
+    fun `containsKey should return false for keys that are not present in big trees`() {
         val intComparator = Comparator<Int> { num1, num2 -> num1 - num2 }
         var newTree = ImmutableAVLTree<Int, Int>(intComparator)
         for (i in 0..1000) {
@@ -190,7 +198,7 @@ internal class ImmutableAVLTreeTest {
     }
 
     @Test
-    fun containsValue_shouldReturnFalseForValuesNotInBigTree() {
+    fun `containsValue should return false if value is not present in big tree`() {
         val intComparator = Comparator<Int> { num1, num2 -> num1 - num2 }
         var newTree = ImmutableAVLTree<Int, String>(intComparator)
         for (i in 0..1000) {
@@ -200,7 +208,7 @@ internal class ImmutableAVLTreeTest {
     }
 
     @Test
-    fun containsValue_shouldReturnTrueForValuesInBigTree() {
+    fun `containsValue should return true if value is in big tree`() {
         val intComparator = Comparator<Int> { num1, num2 -> num1 - num2 }
         var newTree = ImmutableAVLTree<Int, String>(intComparator)
         for (i in 0..1000) {
