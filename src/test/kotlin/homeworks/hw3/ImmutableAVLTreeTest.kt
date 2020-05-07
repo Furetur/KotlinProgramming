@@ -6,10 +6,24 @@ import org.junit.jupiter.api.Assertions.assertFalse
 
 internal class ImmutableAVLTreeTest {
 
-    private val emptyTree = ImmutableAVLTree<String, Int>(Comparator<String> { str1, str2 ->
-        str1.compareTo(str2)
-    })
+    private val stringComparator = Comparator<String> { str1, str2 -> str1.compareTo(str2) }
+
+    private val intComparator = Comparator<Int> { num1, num2 -> num1 - num2 }
+
+    private val emptyTree = ImmutableAVLTree<String, Int>(stringComparator)
+
     private val populatedTree = emptyTree.put("a", 1).put("b", 2).put("c", 4).put("d", 3).put("e", 5)
+
+    private fun generateBigTree(size: Int): Pair<ImmutableAVLTree<String, Int>, Set<Pair<String, Int>>> {
+        var newTree = ImmutableAVLTree<String, Int>(stringComparator)
+        val expectedEntries = mutableSetOf<Pair<String, Int>>()
+        for (i in 1..size) {
+            val curKey = "key - $i"
+            newTree = newTree.put(curKey, i)
+            expectedEntries.add(Pair(curKey, i))
+        }
+        return Pair(newTree, expectedEntries)
+    }
 
     @Test
     fun `entries should be empty if tree is empty`() {
@@ -18,20 +32,9 @@ internal class ImmutableAVLTreeTest {
 
     @Test
     fun `entries should return all entries of the populated tree`() {
-        val actualEntries = populatedTree.entries
-        val expectedEntriesStrings = setOf(
-            ImmutableAVLTree.Node("a", 1),
-            ImmutableAVLTree.Node("b", 2),
-            ImmutableAVLTree.Node("c", 4),
-            ImmutableAVLTree.Node("d", 3),
-            ImmutableAVLTree.Node("e", 5)
-        ).map { it.toString() }
-        val actualEntriesStrings = actualEntries.map { it.toString() }
-        assert(
-            actualEntriesStrings.containsAll(expectedEntriesStrings) && expectedEntriesStrings.containsAll(
-                actualEntriesStrings
-            )
-        )
+        val actualEntries = populatedTree.entries.map { Pair(it.key, it.value) }.toSet()
+        val expectedEntries = setOf(Pair("a", 1), Pair("b", 2), Pair("c", 4), Pair("d", 3), Pair("e", 5))
+        assertEquals(expectedEntries, actualEntries)
     }
 
     @Test
@@ -176,44 +179,65 @@ internal class ImmutableAVLTreeTest {
 
     @Test
     fun `should store all given key value pairs`() {
-        val intComparator = Comparator<Int> { num1, num2 -> num1 - num2 }
-        var newTree = ImmutableAVLTree<Int, Int>(intComparator)
-        val expectedEntries = mutableSetOf<Pair<Int, Int>>()
-        for (i in 0..100) {
-            newTree = newTree.put(i, i)
-            expectedEntries.add(Pair(i, i))
-        }
-        val actualEntriesAsPairs = newTree.entries.map { Pair(it.key, it.value) }.toSet()
-        assertEquals(expectedEntries.toSet(), actualEntriesAsPairs)
+        val (tree, expectedEntries) = generateBigTree(100)
+        val actualEntriesAsPairs = tree.entries.map { Pair(it.key, it.value) }.toSet()
+        assertEquals(expectedEntries, actualEntriesAsPairs)
     }
 
     @Test
     fun `containsKey should return false for keys that are not present in big trees`() {
-        val intComparator = Comparator<Int> { num1, num2 -> num1 - num2 }
-        var newTree = ImmutableAVLTree<Int, Int>(intComparator)
-        for (i in 0..1000) {
-            newTree = newTree.put(i, i)
-        }
-        assertFalse(newTree.containsKey(10000))
+        val (tree) = generateBigTree(100)
+        assertFalse(tree.containsKey("10000"))
+    }
+
+    @Test
+    fun `containsKey should return true for keys that are present in big trees`() {
+        val (tree) = generateBigTree(100)
+        assert(tree.containsKey("key - 50"))
+    }
+
+    @Test
+    fun `size should be equal to the number of entries`() {
+        val (tree) = generateBigTree(1000)
+        assertEquals(1000, tree.size)
+    }
+
+    @Test
+    fun `get should return value in big tree`() {
+        val (tree) = generateBigTree(1000)
+        assertEquals(150, tree["key - 150"])
+    }
+
+    @Test
+    fun `remove should remove entry from big tree`() {
+        val (tree) = generateBigTree(1000)
+        val newTree = tree.remove("key - 150")
+        assertFalse(newTree.containsKey("key - 150"))
+    }
+
+    @Test
+    fun `put should update entry in big tree`() {
+        val (tree) = generateBigTree(1000)
+        val newTree = tree.put("key - 150", -1)
+        assertEquals(-1, newTree["key - 150"])
+    }
+
+    @Test
+    fun `put should put new entries in big tree`() {
+        val (tree) = generateBigTree(1000)
+        val newTree = tree.put("new key", -1)
+        assertEquals(-1, newTree["new key"])
     }
 
     @Test
     fun `containsValue should return false if value is not present in big tree`() {
-        val intComparator = Comparator<Int> { num1, num2 -> num1 - num2 }
-        var newTree = ImmutableAVLTree<Int, String>(intComparator)
-        for (i in 0..1000) {
-            newTree = newTree.put(i, "value=$i")
-        }
-        assertFalse(newTree.containsValue("value=100000"))
+        val (tree) = generateBigTree(1000)
+        assertFalse(tree.containsValue(-5))
     }
 
     @Test
     fun `containsValue should return true if value is in big tree`() {
-        val intComparator = Comparator<Int> { num1, num2 -> num1 - num2 }
-        var newTree = ImmutableAVLTree<Int, String>(intComparator)
-        for (i in 0..1000) {
-            newTree = newTree.put(i, "value=$i")
-        }
-        assert(newTree.containsValue("value=777"))
+        val (tree) = generateBigTree(1000)
+        assert(tree.containsValue(777))
     }
 }
