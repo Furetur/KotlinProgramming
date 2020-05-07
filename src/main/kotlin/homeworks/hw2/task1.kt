@@ -40,8 +40,11 @@ fun main() {
         return
     }
 
-    val charactersToBeRemovedCount =
-        howManyCharactersNeedToBeRemoved("x", BANNED_X_REPETITIONS_NUMBER, inputString)
+    val charactersToBeRemovedCount = howManyCharactersNeedToBeRemoved(
+        "x",
+        BANNED_X_REPETITIONS_NUMBER,
+        inputString
+    )
 
     println("$charactersToBeRemovedCount character(s) need to be removed")
     return

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertThrows
 import java.lang.IllegalArgumentException
 
-internal class TaskTest {
+internal class TaskOneTest {
 
     private fun convertMatchesToList(sequence: Sequence<MatchResult>): List<String> {
         return sequence.map { it.value }.toList()
@@ -60,7 +60,7 @@ internal class TaskTest {
     }
 
     @Test
-    fun `should return empty sequence if nothing mathes the pattern`() {
+    fun `should return empty sequence if nothing matches the pattern`() {
         val str = "abcabc"
         val expected = listOf<String>()
         val actual = convertMatchesToList(findAllRepeatingPatterns("x", 1, str))
@@ -219,7 +219,29 @@ internal class TaskTest {
     @Test
     fun `should return zero if target string is empty 2`() {
         val expected = 0
-        assertEquals(expected, howManyCharactersNeedToBeRemoved("xyzasd", 4, ""))
+        assertEquals(
+            expected,
+            howManyCharactersNeedToBeRemoved("xyzasd", 4, "")
+        )
+    }
+
+    @Test
+    fun `should return 0 if target string does not contain banned patterns`() {
+        val expected = 0
+        assertEquals(
+            expected,
+            howManyCharactersNeedToBeRemoved("x", 4, "no banned patterns")
+        )
+    }
+
+    @Test
+    fun `should return 0 if target string contains banned patterns but they repeat a legal number of times`() {
+        val expected = 0
+        val test = "legal xxx nothing xx and x"
+        assertEquals(
+            expected,
+            howManyCharactersNeedToBeRemoved("x", 4, test)
+        )
     }
 
     @Test
