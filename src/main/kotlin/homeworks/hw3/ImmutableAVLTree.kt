@@ -22,17 +22,15 @@ class ImmutableAVLTree<K, V> : Map<K, V> {
      * @constructor Creates an empty AVLTree if parameters root and rootSize are not received,
      * acts as a wrapper around [root] otherwise
      */
-    constructor(comparator: Comparator<K>) : this(comparator, null, 0)
+    constructor(comparator: Comparator<K>) : this(comparator, null)
 
-    private constructor(comparator: Comparator<K>, root: Node<K, V>?, rootSize: Int) {
+    private constructor(comparator: Comparator<K>, root: Node<K, V>?) {
         this.comparator = comparator
         this.root = root
-        this.rootSize = rootSize
     }
 
     private val comparator: Comparator<K>
     private val root: Node<K, V>?
-    private val rootSize: Int
 
     override val entries: Set<Map.Entry<K, V>>
         get() = root?.asSequence()?.toSet() ?: setOf()
@@ -41,7 +39,7 @@ class ImmutableAVLTree<K, V> : Map<K, V> {
         get() = root?.asSequence()?.map { it.key }?.toSet() ?: setOf()
 
     override val size: Int
-        get() = rootSize
+        get() = root?.size ?: 0
 
     override val values: Collection<V>
         get() = root?.asSequence()?.map { it.value }?.toList() ?: setOf<V>()
@@ -66,6 +64,8 @@ class ImmutableAVLTree<K, V> : Map<K, V> {
             get() = left?.height ?: 0
         private val rightHeight: Int
             get() = right?.height ?: 0
+
+        val size: Int = (left?.size ?: 0) + (right?.size ?: 0) + 1
 
         private val height: Int = max(leftHeight, rightHeight) + 1
         private val balanceFactor: Int = rightHeight - leftHeight
@@ -255,12 +255,11 @@ class ImmutableAVLTree<K, V> : Map<K, V> {
         // tree is empty
         if (root == null) {
             val newRoot = Node(key, value)
-            return ImmutableAVLTree(comparator, newRoot, 1)
+            return ImmutableAVLTree(comparator, newRoot)
         }
         // tree is not empty
         val newRoot = root.set(key, value, comparator)
-        val newSize = if (!containsKey(key)) size + 1 else size
-        return ImmutableAVLTree(comparator, newRoot, newSize)
+        return ImmutableAVLTree(comparator, newRoot)
     }
 
     /**
@@ -276,7 +275,6 @@ class ImmutableAVLTree<K, V> : Map<K, V> {
         // contains the key
         // therefore root is not null
         val newRoot = root!!.remove(key, comparator)
-        val newSize = size - 1
-        return ImmutableAVLTree(comparator, newRoot, newSize)
+        return ImmutableAVLTree(comparator, newRoot)
     }
 }
