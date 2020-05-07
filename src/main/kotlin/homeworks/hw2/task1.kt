@@ -16,7 +16,7 @@ fun findAllRepeatingPatterns(pattern: String, repeatsAtLeast: Int, targetString:
     return repeatingPatterRegex.findAll(targetString)
 }
 
-private fun howManyIllegalRepetitions(pattern: String, bannedRepetitionsNumber: Int, repeatingPattern: String): Int {
+private fun countIllegalRepetitions(pattern: String, bannedRepetitionsNumber: Int, repeatingPattern: String): Int {
     val repetitions = repeatingPattern.length / pattern.length
     return if (repetitions >= bannedRepetitionsNumber) {
         repetitions - bannedRepetitionsNumber + 1
@@ -24,9 +24,9 @@ private fun howManyIllegalRepetitions(pattern: String, bannedRepetitionsNumber: 
         0
     }
 }
-fun howManyCharactersNeedToBeRemoved(bannedPattern: String, bannedRepetitionsNumber: Int, targetStr: String): Int {
+fun countIllegalCharacters(bannedPattern: String, bannedRepetitionsNumber: Int, targetStr: String): Int {
     return findAllRepeatingPatterns(bannedPattern, bannedRepetitionsNumber, targetStr)
-        .map { match -> howManyIllegalRepetitions(bannedPattern, bannedRepetitionsNumber, match.value) }
+        .map { match -> countIllegalRepetitions(bannedPattern, bannedRepetitionsNumber, match.value) }
         .map { illegalRepetitionsNumber -> illegalRepetitionsNumber * bannedPattern.length }
         .sum()
 }
@@ -40,7 +40,7 @@ fun main() {
         return
     }
 
-    val charactersToBeRemovedCount = howManyCharactersNeedToBeRemoved(
+    val charactersToBeRemovedCount = countIllegalCharacters(
         "x",
         BANNED_X_REPETITIONS_NUMBER,
         inputString

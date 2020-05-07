@@ -142,78 +142,78 @@ internal class TaskOneTest {
     @Test
     fun `should return 1 for xxx`() {
         val str = "xxx"
-        assertEquals(1, howManyCharactersNeedToBeRemoved("x", 3, str))
+        assertEquals(1, countIllegalCharacters("x", 3, str))
     }
 
     @Test
     fun `should return 2 for xxxx`() {
         val str = "xxxx"
-        assertEquals(2, howManyCharactersNeedToBeRemoved("x", 3, str))
+        assertEquals(2, countIllegalCharacters("x", 3, str))
     }
 
     @Test
     fun `should return (len - 2) for long xxx`() {
         val str = "x".repeat(100)
-        assertEquals(str.length - 2, howManyCharactersNeedToBeRemoved("x", 3, str))
+        assertEquals(str.length - 2, countIllegalCharacters("x", 3, str))
     }
 
     @Test
     fun `should return 2 for xxx xxx`() {
         val str = "xxx xxx"
-        assertEquals(2, howManyCharactersNeedToBeRemoved("x", 3, str))
+        assertEquals(2, countIllegalCharacters("x", 3, str))
     }
 
     @Test
     fun `should return 3 for xxx xxxx`() {
         val str = "xxx xxxx"
-        assertEquals(3, howManyCharactersNeedToBeRemoved("x", 3, str))
+        assertEquals(3, countIllegalCharacters("x", 3, str))
     }
 
     @Test
     fun `should return 4 for xxxx xxxx`() {
         val str = "xxxx xxxx"
-        assertEquals(4, howManyCharactersNeedToBeRemoved("x", 3, str))
+        assertEquals(4, countIllegalCharacters("x", 3, str))
     }
 
     @Test
     fun `should consider every xxx with rule (len - 2)`() {
         val patternUnit = "x"
         val (test, _, expectedCharsNum) = generateBigTest(patternUnit, 100)
-        assertEquals(expectedCharsNum, howManyCharactersNeedToBeRemoved(patternUnit, 3, test))
+        assertEquals(expectedCharsNum, countIllegalCharacters(patternUnit, 3, test))
     }
 
     @Test
     fun `should consider every xxx in big test`() {
         val patternUnit = "x"
         val (test, _, expectedCharsNum) = generateBigTest(patternUnit, 1000)
-        assertEquals(expectedCharsNum, howManyCharactersNeedToBeRemoved(patternUnit, 3, test))
+        assertEquals(expectedCharsNum, countIllegalCharacters(patternUnit, 3, test))
     }
 
     @Test
     fun `should work with complex patterns`() {
         val test = "patternpattern"
         val expected = 7
-        assertEquals(expected, howManyCharactersNeedToBeRemoved("pattern", 2, test))
+        assertEquals(expected, countIllegalCharacters("pattern", 2, test))
     }
 
     @Test
     fun `should work with several words with complex patterns`() {
         val test = "patternpatternOoOpatternpatternpattern"
         val expected = 21
-        assertEquals(expected, howManyCharactersNeedToBeRemoved("pattern", 2, test))
+        assertEquals(expected, countIllegalCharacters("pattern", 2, test))
     }
 
     @Test
     fun `if repetitionsNumber is 1 then should return number of all chars in all patterns`() {
         val test = "xyzxyzxyztestxyzxyz--xyz"
         val expected = 18
-        assertEquals(expected, howManyCharactersNeedToBeRemoved("xyz", 1, test))
+        assertEquals(expected, countIllegalCharacters("xyz", 1, test))
     }
 
     @Test
     fun `should return zero if target string is empty 1`() {
         val expected = 0
-        assertEquals(expected, howManyCharactersNeedToBeRemoved("xyz", 1, ""))
+        assertEquals(expected, countIllegalCharacters("xyz", 1, ""))
     }
 
     @Test
@@ -221,7 +221,7 @@ internal class TaskOneTest {
         val expected = 0
         assertEquals(
             expected,
-            howManyCharactersNeedToBeRemoved("xyzasd", 4, "")
+            countIllegalCharacters("xyzasd", 4, "")
         )
     }
 
@@ -230,7 +230,7 @@ internal class TaskOneTest {
         val expected = 0
         assertEquals(
             expected,
-            howManyCharactersNeedToBeRemoved("x", 4, "no banned patterns")
+            countIllegalCharacters("x", 4, "no banned patterns")
         )
     }
 
@@ -240,21 +240,21 @@ internal class TaskOneTest {
         val test = "legal xxx nothing xx and x"
         assertEquals(
             expected,
-            howManyCharactersNeedToBeRemoved("x", 4, test)
+            countIllegalCharacters("x", 4, test)
         )
     }
 
     @Test
     fun `should throw if repetitionsNumber is 0`() {
         assertThrows(IllegalArgumentException::class.java) {
-            howManyCharactersNeedToBeRemoved("xyzasd", 0, "")
+            countIllegalCharacters("xyzasd", 0, "")
         }
     }
 
     @Test
     fun `should throw if repetitionsNumber is less than 0`() {
         assertThrows(IllegalArgumentException::class.java) {
-            howManyCharactersNeedToBeRemoved("xyzasd", -1, "")
+            countIllegalCharacters("xyzasd", -1, "")
         }
     }
 }
