@@ -24,6 +24,7 @@ private fun countIllegalRepetitions(pattern: String, bannedRepetitionsNumber: In
         0
     }
 }
+
 fun countIllegalCharacters(bannedPattern: String, bannedRepetitionsNumber: Int, targetStr: String): Int {
     return findAllRepeatingPatterns(bannedPattern, bannedRepetitionsNumber, targetStr)
         .map { match -> countIllegalRepetitions(bannedPattern, bannedRepetitionsNumber, match.value) }
