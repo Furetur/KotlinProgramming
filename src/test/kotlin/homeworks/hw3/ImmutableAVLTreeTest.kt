@@ -4,12 +4,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 
-val emptyTree = ImmutableAVLTree<String, Int>(Comparator<String> { str1, str2 ->
-    str1.compareTo(str2)
-})
-val populatedTree = emptyTree.put("a", 1).put("b", 2).put("c", 4).put("d", 3).put("e", 5)
-
 internal class ImmutableAVLTreeTest {
+
+    private val emptyTree = ImmutableAVLTree<String, Int>(Comparator<String> { str1, str2 ->
+        str1.compareTo(str2)
+    })
+    private val populatedTree = emptyTree.put("a", 1).put("b", 2).put("c", 4).put("d", 3).put("e", 5)
 
     @Test
     fun getEntries_shouldReturnAnEmptySetForEmptyTree() {
