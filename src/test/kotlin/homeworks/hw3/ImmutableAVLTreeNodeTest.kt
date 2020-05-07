@@ -11,14 +11,16 @@ internal class ImmutableAVLTreeNodeTest {
 
     private val stringComparator = Comparator<String> { str1, str2 -> str1.compareTo(str2) }
 
-    private var root: ImmutableAVLTree.Node<String, Int> = ImmutableAVLTree.Node("k", 1)
+    private var root: ImmutableAVLTree.Node<String, Int> = ImmutableAVLTree.Node("k", 1, stringComparator)
 
     init {
-        val leftChild = ImmutableAVLTree.Node("a", 1)
-        val rightChildOfRightChild = ImmutableAVLTree.Node("e", 5)
-        val leftChildOfRightChild = ImmutableAVLTree.Node("c", 4)
-        val rightChild = ImmutableAVLTree.Node("d", 3, leftChildOfRightChild, rightChildOfRightChild)
-        root = ImmutableAVLTree.Node("b", 2, leftChild, rightChild)
+        val leftChild = ImmutableAVLTree.Node("a", 1, stringComparator)
+        val rightChildOfRightChild = ImmutableAVLTree.Node("e", 5, stringComparator)
+        val leftChildOfRightChild = ImmutableAVLTree.Node("c", 4, stringComparator)
+        val rightChild = ImmutableAVLTree.Node(
+            "d", 3, stringComparator, leftChildOfRightChild, rightChildOfRightChild
+        )
+        root = ImmutableAVLTree.Node("b", 2, stringComparator, leftChild, rightChild)
     }
 
     // returns -1 if the subtree is not balanced
@@ -36,91 +38,91 @@ internal class ImmutableAVLTreeNodeTest {
     }
 
     private fun buildBigTree(size: Int): ImmutableAVLTree.Node<String, Int> {
-        var node = ImmutableAVLTree.Node<String, Int>("0", 0)
+        var node = ImmutableAVLTree.Node<String, Int>("0", 0, stringComparator)
         for (i in 1..size) {
-            node = node.set("key-$i", i, stringComparator)
+            node = node.set("key-$i", i)
         }
         return node
     }
 
     @Test
     fun `get should return correct value of left child`() {
-        assertEquals(1, root.get("a", stringComparator))
+        assertEquals(1, root.get("a"))
     }
 
     @Test
     fun `get should return correct value of the rightest child`() {
-        assertEquals(5, root.get("e", stringComparator))
+        assertEquals(5, root.get("e"))
     }
 
     @Test
     fun `get should return correct value of left child of right child`() {
-        assertEquals(4, root.get("c", stringComparator))
+        assertEquals(4, root.get("c"))
     }
 
     @Test
     fun `get should return correct value of the right child`() {
-        assertEquals(3, root.get("d", stringComparator))
+        assertEquals(3, root.get("d"))
     }
 
     @Test
     fun `get should return value of root`() {
-        assertEquals(2, root.get("b", stringComparator))
+        assertEquals(2, root.get("b"))
     }
 
     @Test
     fun `set should update the roots value`() {
-        val newRoot = root.set("b", 3, stringComparator)
+        val newRoot = root.set("b", 3)
         assertEquals(3, newRoot.value)
     }
 
     @Test
     fun `set should update the most remote node`() {
-        val newRoot = root.set("e", 6, stringComparator)
-        assertEquals(6, newRoot.get("e", stringComparator))
+        val newRoot = root.set("e", 6)
+        assertEquals(6, newRoot.get("e"))
     }
 
     @Test
     fun `set should add new nodes that can be accessed by get`() {
-        val newRoot = root.set("ab", 101, stringComparator)
-        assertEquals(101, newRoot.get("ab", stringComparator))
+        val newRoot = root.set("ab", 101)
+        assertEquals(101, newRoot.get("ab"))
     }
 
     @Test
     fun `set should work with empty string keys`() {
-        val newRoot = root.set("", 909, stringComparator)
-        assertEquals(909, newRoot.get("", stringComparator))
+        val newRoot = root.set("", 909)
+        assertEquals(909, newRoot.get(""))
     }
 
     @Test
     fun `remove should be able to remove the root`() {
-        val newRoot = root.remove("b", stringComparator)
-        assertEquals(null, newRoot!!.get("b", stringComparator))
+        val newRoot = root.remove("b")
+        assertEquals(null, newRoot!!.get("b"))
     }
 
     @Test
     fun `remove should be able to remove the root of subtree`() {
-        val newRoot = root.remove("d", stringComparator)
+        val newRoot = root.remove("d")
 
-        assertEquals(null, newRoot!!.get("d", stringComparator))
+        assertEquals(null, newRoot!!.get("d"))
     }
 
     @Test
     fun `remove should remove leaf 1`() {
-        val newRoot = root.remove("c", stringComparator)
-        assertEquals(null, newRoot!!.get("c", stringComparator))
+        val newRoot = root.remove("c")
+        assertEquals(null, newRoot!!.get("c"))
     }
 
     @Test
     fun `remove should remove leaf 2`() {
-        val newRoot = root.remove("e", stringComparator)
-        assertEquals(null, newRoot!!.get("e", stringComparator))
+        val newRoot = root.remove("e")
+        assertEquals(null, newRoot!!.get("e"))
     }
 
     @Test
     fun `remove should remove leaf 3`() {
-        val newRoot = root.remove("a", stringComparator)
-        assertEquals(null, newRoot!!.get("a", stringComparator))
+        val newRoot = root.remove("a")
+        assertEquals(null, newRoot!!.get("a"))
     }
 
     @Test
