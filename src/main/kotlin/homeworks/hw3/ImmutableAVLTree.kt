@@ -4,24 +4,35 @@ import java.lang.Integer.max
 import java.util.Stack
 import kotlin.Comparator
 
-const val BALANCE_FACTOR_RIGHT_SUBTREE_TOO_HIGH = 2
-const val BALANCE_FACTOR_LEFT_SUBTREE_TOO_HIGH = -2
-
 /**
  * AVLTree implementation of Map
  * @param K type of keys
  * @param V type of values
- * @param comparator is used to compare keys
- * @param root is used internally by AVLTree, represents the tree
- * @param rootSize number of nodes in the root's subtree
- * @constructor Creates an empty AVLTree if parameters root and rootSize are not received,
- * acts as a wrapper around [root] otherwise
  */
-class ImmutableAVLTree<K, V>(
-    private val comparator: Comparator<K>,
-    private val root: Node<K, V>? = null,
-    private val rootSize: Int = 0
-) : Map<K, V> {
+class ImmutableAVLTree<K, V> : Map<K, V> {
+
+    companion object {
+        const val BALANCE_FACTOR_RIGHT_SUBTREE_TOO_HIGH = 2
+        const val BALANCE_FACTOR_LEFT_SUBTREE_TOO_HIGH = -2
+    }
+
+    /**
+     * Constructor of the ImmutableAVLTree
+     * @param comparator is used to compare keys
+     * @constructor Creates an empty AVLTree if parameters root and rootSize are not received,
+     * acts as a wrapper around [root] otherwise
+     */
+    constructor(comparator: Comparator<K>) : this(comparator, null, 0)
+
+    private constructor(comparator: Comparator<K>, root: Node<K, V>?, rootSize: Int) {
+        this.comparator = comparator
+        this.root = root
+        this.rootSize = rootSize
+    }
+
+    private val comparator: Comparator<K>
+    private val root: Node<K, V>?
+    private val rootSize: Int
 
     override val entries: Set<Map.Entry<K, V>>
         get() = root?.asSequence()?.toSet() ?: setOf()
