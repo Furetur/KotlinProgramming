@@ -125,6 +125,8 @@ internal class ImmutableAVLTreeNodeTest {
         assertEquals(null, newRoot!!.get("a"))
     }
 
+    // balance tests
+
     @Test
     fun `subtree of 100 elements should remain balanced`() {
         val node = buildBigTree(100)
