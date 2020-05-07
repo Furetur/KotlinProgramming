@@ -72,49 +72,31 @@ class ImmutableAVLTree<K, V> : Map<K, V> {
 
         private fun rotateRight(): Node<K, V> {
             // store variables for quick access
-            val willBecomeNewRoot = left ?: throw IllegalCallerException("Node's left child cannot be null")
-            val willBecomeLeftChildOfNewRoot = willBecomeNewRoot.left
-            val willBecomeLeftChildOfRightChildOfNewRoot = willBecomeNewRoot.right
-            val willBecomeRightChildOfRightChildOfNewRoot = right
+            val newRoot = left ?: throw IllegalCallerException("Node's left child cannot be null")
+            val futureLeftChildOfNewRoot = newRoot.left
+            val futureLeftChildOfRightChildOfNewRoot = newRoot.right
+            val futureRightChildOfRightChildOfNewRoot = right
 
             // new right child
-            val newRootRightChild =
-                Node(
-                    key,
-                    value,
-                    willBecomeLeftChildOfRightChildOfNewRoot,
-                    willBecomeRightChildOfRightChildOfNewRoot
-                )
-            // return newRoot
-            return Node(
-                willBecomeNewRoot.key,
-                willBecomeNewRoot.value,
-                willBecomeLeftChildOfNewRoot,
-                newRootRightChild
+            val newRootRightChild = Node(
+                key, value, futureLeftChildOfRightChildOfNewRoot, futureRightChildOfRightChildOfNewRoot
             )
+            // return newRoot
+            return Node(newRoot.key, newRoot.value, futureLeftChildOfNewRoot, newRootRightChild)
         }
 
         private fun rotateLeft(): Node<K, V> {
             // store variables for quick access
-            val willBecomeNewRoot = right ?: throw IllegalCallerException("Node's right child cannot be null")
-            val willBecomeRightChildOfNewRoot = willBecomeNewRoot.right
-            val willBecomeLeftChildOfLeftChildOfNewRoot = left
-            val willBecomeRightChildOfLeftChildOfNewRoot = willBecomeNewRoot.left
+            val newRoot = right ?: throw IllegalCallerException("Node's right child cannot be null")
+            val futureRightChildOfNewRoot = newRoot.right
+            val futureLeftChildOfLeftChildOfNewRoot = left
+            val futureRightChildOfLeftChilfOfNewRoot = newRoot.left
 
             // new left child
-            val newRootLeftChild =
-                Node(
-                    key,
-                    value,
-                    willBecomeLeftChildOfLeftChildOfNewRoot,
-                    willBecomeRightChildOfLeftChildOfNewRoot
-                )
-            return Node(
-                willBecomeNewRoot.key,
-                willBecomeNewRoot.value,
-                newRootLeftChild,
-                willBecomeRightChildOfNewRoot
+            val newRootLeftChild = Node(
+                key, value, futureLeftChildOfLeftChildOfNewRoot, futureRightChildOfLeftChilfOfNewRoot
             )
+            return Node(newRoot.key, newRoot.value, newRootLeftChild, futureRightChildOfNewRoot)
         }
 
         private fun balance(): Node<K, V> {
@@ -170,17 +152,11 @@ class ImmutableAVLTree<K, V> : Map<K, V> {
 
             return if (shouldGoLeft) {
                 // key < this.key
-                val newLeft = left?.set(key, value, comparator) ?: Node(
-                    key,
-                    value
-                )
+                val newLeft = left?.set(key, value, comparator) ?: Node(key, value)
                 Node(this.key, this.value, newLeft, right).balance()
             } else {
                 // key > this.key
-                val newRight = right?.set(key, value, comparator) ?: Node(
-                    key,
-                    value
-                )
+                val newRight = right?.set(key, value, comparator) ?: Node(key, value)
                 Node(this.key, this.value, left, newRight).balance()
             }
         }
