@@ -38,13 +38,13 @@ class ImmutableAVLTree<K, V> : Map<K, V> {
         get() = root?.asSequence()?.toSet() ?: setOf()
 
     override val keys: Set<K>
-        get() = entries.map { entry -> entry.key }.toSet()
+        get() = root?.asSequence()?.map { it.key }?.toSet() ?: setOf()
 
     override val size: Int
         get() = rootSize
 
     override val values: Collection<V>
-        get() = entries.map { entry -> entry.value }
+        get() = root?.asSequence()?.map { it.value }?.toList() ?: setOf<V>()
 
     /**
      * Node of the ImmutableAVLTree, which is an entry of this tree
