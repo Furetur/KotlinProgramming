@@ -11,8 +11,7 @@ fun findAllRepeatingPatterns(pattern: String, repeatsAtLeast: Int, targetString:
     if (pattern.isEmpty()) {
         throw IllegalArgumentException("Pattern cannot be empty")
     }
-    val regexPattern = pattern.repeat(repeatsAtLeast - 1) + "($pattern)+"
-    val repeatingPatterRegex = Regex(regexPattern)
+    val repeatingPatterRegex = Regex("($pattern){$repeatsAtLeast,}")
     return repeatingPatterRegex.findAll(targetString)
 }
 
