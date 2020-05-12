@@ -186,58 +186,58 @@ internal class ImmutableAVLTreeTest {
 
     @Test
     fun `containsKey should return false for keys that are not present in big trees`() {
-        val (tree) = generateBigTree(100)
+        val (tree, _) = generateBigTree(100)
         assertFalse(tree.containsKey("10000"))
     }
 
     @Test
     fun `containsKey should return true for keys that are present in big trees`() {
-        val (tree) = generateBigTree(100)
+        val (tree, _) = generateBigTree(100)
         assert(tree.containsKey("key - 50"))
     }
 
     @Test
     fun `size should be equal to the number of entries`() {
-        val (tree) = generateBigTree(1000)
+        val (tree, _) = generateBigTree(1000)
         assertEquals(1000, tree.size)
     }
 
     @Test
     fun `get should return value in big tree`() {
-        val (tree) = generateBigTree(1000)
+        val (tree, _) = generateBigTree(1000)
         assertEquals(150, tree["key - 150"])
     }
 
     @Test
     fun `remove should remove entry from big tree`() {
-        val (tree) = generateBigTree(1000)
+        val (tree, _) = generateBigTree(1000)
         val newTree = tree.remove("key - 150")
         assertFalse(newTree.containsKey("key - 150"))
     }
 
     @Test
     fun `put should update entry in big tree`() {
-        val (tree) = generateBigTree(1000)
+        val (tree, _) = generateBigTree(1000)
         val newTree = tree.put("key - 150", -1)
         assertEquals(-1, newTree["key - 150"])
     }
 
     @Test
     fun `put should put new entries in big tree`() {
-        val (tree) = generateBigTree(1000)
+        val (tree, _) = generateBigTree(1000)
         val newTree = tree.put("new key", -1)
         assertEquals(-1, newTree["new key"])
     }
 
     @Test
     fun `containsValue should return false if value is not present in big tree`() {
-        val (tree) = generateBigTree(1000)
+        val (tree, _) = generateBigTree(1000)
         assertFalse(tree.containsValue(-5))
     }
 
     @Test
     fun `containsValue should return true if value is in big tree`() {
-        val (tree) = generateBigTree(1000)
+        val (tree, _) = generateBigTree(1000)
         assert(tree.containsValue(777))
     }
 }
