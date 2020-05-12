@@ -102,22 +102,20 @@ class ImmutableAVLTree<K, V> : Map<K, V> {
         }
 
         private fun balance(): Node<K, V> {
-            val rightSubtreeIsTooHigh = balanceFactor == BALANCE_FACTOR_RIGHT_SUBTREE_TOO_HIGH
-            val leftSubtreeIsTooHigh = balanceFactor == BALANCE_FACTOR_LEFT_SUBTREE_TOO_HIGH
+            val isRightSubtreeTooHigh = balanceFactor == BALANCE_FACTOR_RIGHT_SUBTREE_TOO_HIGH
+            val isLeftSubtreeTooHigh = balanceFactor == BALANCE_FACTOR_LEFT_SUBTREE_TOO_HIGH
 
-            if (!rightSubtreeIsTooHigh && !leftSubtreeIsTooHigh) {
-                // already balanced
-                return this
-            }
-
-            return if (rightSubtreeIsTooHigh) {
+            return if (right != null && isRightSubtreeTooHigh) {
                 // node.right is not null because balanceFactor == 2
-                val newRight = if (right!!.balanceFactor < 0) right.rotateRight() else right
+                val newRight = if (right.balanceFactor < 0) right.rotateRight() else right
                 Node(key, value, comparator, left, newRight).rotateLeft()
-            } else {
+            } else if (left != null && isLeftSubtreeTooHigh) {
                 // node.left is not null because balanceFactor == -2
-                val newLeft = if (left!!.balanceFactor > 0) left.rotateLeft() else left
+                val newLeft = if (left.balanceFactor > 0) left.rotateLeft() else left
                 Node(key, value, comparator, newLeft, right).rotateRight()
+            } else {
+                // already balanced
+                this
             }
         }
 
@@ -269,12 +267,12 @@ class ImmutableAVLTree<K, V> : Map<K, V> {
      * @return new updated tree
      */
     fun remove(key: K): ImmutableAVLTree<K, V> {
-        if (!containsKey(key)) {
+        if (root == null || !containsKey(key)) {
             return this
         }
         // contains the key
         // therefore root is not null
-        val newRoot = root!!.remove(key)
+        val newRoot = root.remove(key)
         return ImmutableAVLTree(comparator, newRoot)
     }
 }

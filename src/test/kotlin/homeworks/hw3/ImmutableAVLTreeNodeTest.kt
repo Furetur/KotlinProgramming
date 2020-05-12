@@ -1,6 +1,7 @@
 package homeworks.hw3
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
 import kotlin.Comparator
@@ -25,8 +26,10 @@ internal class ImmutableAVLTreeNodeTest {
 
     // returns -1 if the subtree is not balanced
     private fun <K, V> checkBalance(node: ImmutableAVLTree.Node<K, V>): Int {
-        val leftHeight = if (node.left != null) checkBalance(node.left!!) else 0
-        val rightHeight = if (node.right != null) checkBalance(node.right!!) else 0
+        val left = node.left
+        val right = node.right
+        val leftHeight = if (left != null) checkBalance(left) else 0
+        val rightHeight = if (right != null) checkBalance(right) else 0
 
         return if (leftHeight == -1 || rightHeight == -1) {
             -1
@@ -97,32 +100,46 @@ internal class ImmutableAVLTreeNodeTest {
     @Test
     fun `remove should be able to remove the root`() {
         val newRoot = root.remove("b")
-        assertEquals(null, newRoot!!.get("b"))
+        assertNotNull(newRoot)
+        if (newRoot != null) {
+            assertEquals(null, newRoot.get("b"))
+        }
     }
 
     @Test
     fun `remove should be able to remove the root of subtree`() {
         val newRoot = root.remove("d")
-
-        assertEquals(null, newRoot!!.get("d"))
+        assertNotNull(newRoot)
+        if (newRoot != null) {
+            assertEquals(null, newRoot.get("d"))
+        }
     }
 
     @Test
     fun `remove should remove leaf 1`() {
         val newRoot = root.remove("c")
-        assertEquals(null, newRoot!!.get("c"))
+        assertNotNull(newRoot)
+        if (newRoot != null) {
+            assertEquals(null, newRoot.get("c"))
+        }
     }
 
     @Test
     fun `remove should remove leaf 2`() {
         val newRoot = root.remove("e")
-        assertEquals(null, newRoot!!.get("e"))
+        assertNotNull(newRoot)
+        if (newRoot != null) {
+            assertEquals(null, newRoot.get("e"))
+        }
     }
 
     @Test
     fun `remove should remove leaf 3`() {
         val newRoot = root.remove("a")
-        assertEquals(null, newRoot!!.get("a"))
+        assertNotNull(newRoot)
+        if (newRoot != null) {
+            assertEquals(null, newRoot.get("a"))
+        }
     }
 
     // balance tests
