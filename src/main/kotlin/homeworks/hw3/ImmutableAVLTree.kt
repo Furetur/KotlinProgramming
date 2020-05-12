@@ -264,7 +264,7 @@ class ImmutableAVLTree<K, V> : Map<K, V> {
 
     /**
      * Removes the entry with the received [key]
-     * However, similarly to `put` does not update the folowing tree, but returns a new updated tree
+     * However, similarly to `put` does not update the following tree, but returns a new updated tree
      * @param key of the entry that should be removed
      * @return new updated tree
      */
