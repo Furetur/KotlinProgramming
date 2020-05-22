@@ -27,6 +27,13 @@ dependencies {
     implementation("org.openjfx:javafx:11.0.2")
     implementation("org.openjfx:javafx-controls:11.0.2")
     implementation("org.openjfx:javafx-maven-plugin:0.0.4")
+    implementation("io.ktor:ktor-server-netty:1.3.1")
+    implementation("io.ktor:ktor-websockets:1.3.1")
+    implementation("io.ktor:ktor-client-websockets:1.3.1")
+    implementation("io.ktor:ktor-client-cio:1.3.1")
+    implementation("io.ktor:ktor-client-js:1.3.1")
+    implementation("io.ktor:ktor-client-okhttp:1.3.1")
+
 }
 
 javafx {
