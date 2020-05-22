@@ -22,7 +22,10 @@ class PairsGameApp : App(GameView::class, MainStylesheet::class) {
         FIELD_SIZE = FIELD_LINEAR_SIZE * FIELD_LINEAR_SIZE
         // create stage with the defined global parameters...
         super.start(stage)
-        // set window properties
+        setStageProperties(stage)
+    }
+
+    private fun setStageProperties(stage: Stage) {
         stage.width = (BUTTON_WIDTH * FIELD_LINEAR_SIZE).toDouble()
         stage.height = (BUTTON_HEIGHT * FIELD_LINEAR_SIZE + HEADER_HEIGHT).toDouble()
         stage.isResizable = false
