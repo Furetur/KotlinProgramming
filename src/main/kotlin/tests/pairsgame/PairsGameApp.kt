@@ -16,12 +16,13 @@ class PairsGameApp : App(GameView::class, MainStylesheet::class) {
     }
 
     override fun start(stage: Stage) {
+        // define global parameters
         val fieldLinearSizeParameter = parameters.raw[0].toInt()
         FIELD_LINEAR_SIZE = fieldLinearSizeParameter
         FIELD_SIZE = FIELD_LINEAR_SIZE * FIELD_LINEAR_SIZE
-
+        // create stage with the defined global parameters...
         super.start(stage)
-
+        // set window properties
         stage.width = (BUTTON_WIDTH * FIELD_LINEAR_SIZE).toDouble()
         stage.height = (BUTTON_HEIGHT * FIELD_LINEAR_SIZE + HEADER_HEIGHT).toDouble()
         stage.isResizable = false

@@ -16,6 +16,7 @@ class GameFieldView : View() {
             button(buttonStatus.text) {
                 addClass(gameButton)
                 isDisable = buttonStatus.isShown.value
+                // because isDisable does not accept bindings or properties apparently
                 buttonStatus.isShown.onChange {
                     isDisable = it
                 }

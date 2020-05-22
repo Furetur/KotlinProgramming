@@ -25,10 +25,11 @@ class GameModel(size: Int) {
     }
 
     fun pickButton(position: Int) {
-        // if button already picked or max number of buttons is already picked
+        // if this button is already picked
         if (pickedButtons.contains(position)) {
             return
         }
+        // if the position is not valid
         if (!field.indices.contains(position)) {
             throw IllegalArgumentException("Button with this position does not exist")
         }
@@ -39,21 +40,21 @@ class GameModel(size: Int) {
         checkCorrectCombination()
     }
 
-    private fun isCurrentCombinationCorrect(): Boolean {
-        return if (pickedButtons.isEmpty()) {
-            false
-        } else {
-            val pickedButtonsValues = pickedButtons.map { field[it] }
-            return pickedButtonsValues.all { it == pickedButtonsValues.first() }
-        }
-    }
-
     private fun checkCorrectCombination() {
         if (pickedButtons.size == MAX_NUMBER_OF_BUTTONS_PICKED) {
             if (isCurrentCombinationCorrect()) {
                 revealedButtons.addAll(pickedButtons)
                 pickedButtons.clear()
             }
+        }
+    }
+
+    private fun isCurrentCombinationCorrect(): Boolean {
+        return if (pickedButtons.isEmpty()) {
+            false
+        } else {
+            val pickedButtonsValues = pickedButtons.map { field[it] }
+            return pickedButtonsValues.all { it == pickedButtonsValues.first() }
         }
     }
 }
