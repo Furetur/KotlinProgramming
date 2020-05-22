@@ -33,6 +33,7 @@ class GameModel(size: Int) {
         if (!field.indices.contains(position)) {
             throw IllegalArgumentException("Button with this position does not exist")
         }
+        // if it is a new series of picked buttons
         if (pickedButtons.size == MAX_NUMBER_OF_BUTTONS_PICKED) {
             pickedButtons.clear()
         }

@@ -11,7 +11,7 @@ class GameController : Controller() {
     val model = GameModel(FIELD_SIZE)
     val buttonStatuses = model.field.withIndex().map { ButtonStatus(it.index, it.value) }
 
-    inner class ButtonStatus(val position: Int, val value: Int) {
+    inner class ButtonStatus(val position: Int, private val value: Int) {
         private val isPicked = booleanBinding(model.pickedButtons) {
             contains(position)
         }
