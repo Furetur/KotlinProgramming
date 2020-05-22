@@ -148,6 +148,28 @@ internal class GameModelTest {
     }
 
     @Test
+    fun `all correctly picked buttons should end up in the revealed list`() {
+        val someAnswers = solve(smallModel.field).slice(0..2)
+        val expected = someAnswers.map { listOf(it.first, it.second) }.flatten()
+        for ((leftPosition, rightPosition) in someAnswers) {
+            smallModel.pickButton(leftPosition)
+            smallModel.pickButton(rightPosition)
+        }
+        assertEquals(expected, smallModel.revealedButtons)
+    }
+
+    @Test
+    fun `all correctly picked buttons should end up in the revealed list big`() {
+        val someAnswers = solve(bigModel.field).slice(0..150)
+        val expected = someAnswers.map { listOf(it.first, it.second) }.flatten()
+        for ((leftPosition, rightPosition) in someAnswers) {
+            bigModel.pickButton(leftPosition)
+            bigModel.pickButton(rightPosition)
+        }
+        assertEquals(expected, bigModel.revealedButtons)
+    }
+
+    @Test
     fun `game should be over when all buttons are picked`() {
         val answers = solve(smallModel.field)
         for ((leftPosition, rightPosition) in answers) {
