@@ -22,7 +22,7 @@ class GameController : Controller() {
             isPicked.value || isRevealed.value
         }
         val text = stringBinding(this, isShown) {
-            if (isShown.value == true) {
+            if (isShown.value) {
                 value.toString()
             } else {
                 ""
