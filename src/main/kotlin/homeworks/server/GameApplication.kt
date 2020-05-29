@@ -12,18 +12,29 @@ import io.ktor.websocket.WebSocketServerSession
 import io.ktor.websocket.WebSockets
 import io.ktor.websocket.webSocket
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
+import java.lang.IllegalArgumentException
 
 class GameApplication {
     val server = GameServer()
 
-    fun handleMessage(session: WebSocketServerSession, message: String) {
+    fun handleTurn(session: WebSocketServerSession, message: String) {
         val tokens = message.split(" ")
-        when (tokens[0]) {
-            "turn" -> server.handleTurn(session, message)
+        if (tokens.size < 2) {
+            throw IllegalArgumentException("Message does not contain the position")
+        }
+        val position = tokens[1].toIntOrNull() ?: throw IllegalArgumentException("Message's position must be Int")
+        server.handleTurn(session, position)
+    }
+
+    fun handleMessage(session: WebSocketServerSession, message: String) {
+        println("Message received: $message")
+        when {
+            message.startsWith("turn") -> handleTurn(session, message)
         }
     }
 
     fun handleConnect(session: WebSocketServerSession) {
+        println("Client connected")
         server.playerConnect(session)
     }
 
@@ -31,7 +42,7 @@ class GameApplication {
         server.playerDisconnect(session)
     }
 
-    fun Application.main() {
+    fun start() {
         embeddedServer(Netty, 8080) {
             install(WebSockets)
             routing {
