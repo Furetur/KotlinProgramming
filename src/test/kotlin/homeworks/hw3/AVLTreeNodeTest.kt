@@ -8,24 +8,24 @@ import kotlin.Comparator
 import kotlin.math.abs
 import kotlin.math.max
 
-internal class ImmutableAVLTreeNodeTest {
+internal class AVLTreeNodeTest {
 
     private val stringComparator = Comparator<String> { str1, str2 -> str1.compareTo(str2) }
 
-    private var root: ImmutableAVLTree.Node<String, Int> = ImmutableAVLTree.Node("k", 1, stringComparator)
+    private var root: AVLTree.Node<String, Int> = AVLTree.Node("k", 1, stringComparator)
 
     init {
-        val leftChild = ImmutableAVLTree.Node("a", 1, stringComparator)
-        val rightChildOfRightChild = ImmutableAVLTree.Node("e", 5, stringComparator)
-        val leftChildOfRightChild = ImmutableAVLTree.Node("c", 4, stringComparator)
-        val rightChild = ImmutableAVLTree.Node(
+        val leftChild = AVLTree.Node("a", 1, stringComparator)
+        val rightChildOfRightChild = AVLTree.Node("e", 5, stringComparator)
+        val leftChildOfRightChild = AVLTree.Node("c", 4, stringComparator)
+        val rightChild = AVLTree.Node(
             "d", 3, stringComparator, leftChildOfRightChild, rightChildOfRightChild
         )
-        root = ImmutableAVLTree.Node("b", 2, stringComparator, leftChild, rightChild)
+        root = AVLTree.Node("b", 2, stringComparator, leftChild, rightChild)
     }
 
     // returns -1 if the subtree is not balanced
-    private fun <K, V> checkBalance(node: ImmutableAVLTree.Node<K, V>): Int {
+    private fun <K, V> checkBalance(node: AVLTree.Node<K, V>): Int {
         val left = node.left
         val right = node.right
         val leftHeight = if (left != null) checkBalance(left) else 0
@@ -40,8 +40,8 @@ internal class ImmutableAVLTreeNodeTest {
         }
     }
 
-    private fun buildBigTree(size: Int): ImmutableAVLTree.Node<String, Int> {
-        var node = ImmutableAVLTree.Node<String, Int>("0", 0, stringComparator)
+    private fun buildBigTree(size: Int): AVLTree.Node<String, Int> {
+        var node = AVLTree.Node<String, Int>("0", 0, stringComparator)
         for (i in 1..size) {
             node = node.set("key-$i", i)
         }

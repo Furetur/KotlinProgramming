@@ -3,26 +3,38 @@ package homeworks.hw3
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.BeforeEach
 
-internal class ImmutableAVLTreeTest {
+internal class AVLTreeTest {
 
     private val stringComparator = Comparator<String> { str1, str2 -> str1.compareTo(str2) }
 
     private val intComparator = Comparator<Int> { num1, num2 -> num1 - num2 }
 
-    private val emptyTree = ImmutableAVLTree<String, Int>(stringComparator)
+    private val emptyTree = AVLTree<String, Int>(stringComparator)
 
-    private val populatedTree = emptyTree.put("a", 1).put("b", 2).put("c", 4).put("d", 3).put("e", 5)
+    private val populatedTree = AVLTree<String, Int>(stringComparator)
 
-    private fun generateBigTree(size: Int): Pair<ImmutableAVLTree<String, Int>, Set<Pair<String, Int>>> {
-        var newTree = ImmutableAVLTree<String, Int>(stringComparator)
+    private fun generateBigTree(size: Int): Pair<AVLTree<String, Int>, Set<Pair<String, Int>>> {
+        val tree = AVLTree<String, Int>(stringComparator)
         val expectedEntries = mutableSetOf<Pair<String, Int>>()
         for (i in 1..size) {
             val curKey = "key - $i"
-            newTree = newTree.put(curKey, i)
+            tree[curKey] = i
             expectedEntries.add(Pair(curKey, i))
         }
-        return Pair(newTree, expectedEntries)
+        return Pair(tree, expectedEntries)
+    }
+
+    @BeforeEach
+    fun initTrees() {
+        emptyTree.clear()
+        populatedTree.clear()
+        populatedTree["a"] = 1
+        populatedTree["b"] = 2
+        populatedTree["c"] = 4
+        populatedTree["d"] = 3
+        populatedTree["e"] = 5
     }
 
     @Test
@@ -117,62 +129,65 @@ internal class ImmutableAVLTreeTest {
 
     @Test
     fun `values that are put into empty tree should be gettable`() {
-        val newTree = emptyTree.put("a", 1)
-        assertEquals(1, newTree["a"])
+        emptyTree["a"] = 1
+        assertEquals(1, emptyTree["a"])
     }
 
     @Test
     fun `values that are put into populated tree should be gettable`() {
-        val newTree = populatedTree.put("abb", 123)
-        assertEquals(123, newTree["abb"])
+        populatedTree["abb"] = 123
+        assertEquals(123, populatedTree["abb"])
     }
 
     @Test
     fun `put should increate tree size by 1`() {
-        val newTree = populatedTree.put("132", 132)
-        assertEquals(populatedTree.size + 1, newTree.size)
+        val oldSize = populatedTree.size
+        populatedTree["132"] = 132
+        assertEquals(oldSize + 1, populatedTree.size)
     }
 
     @Test
     fun `put should update existing entries if key is already in tree`() {
-        val newTree = emptyTree.put("a", 1).put("a", 2)
-        assertEquals(2, newTree["a"])
+        emptyTree["a"] = 1
+        emptyTree["a"] = 2
+        assertEquals(2, emptyTree["a"])
     }
 
     @Test
     fun `remove should remove existing keys`() {
-        val newTree = populatedTree.remove("b")
-        assertEquals(null, newTree["b"])
+        populatedTree.remove("b")
+        assertEquals(null, populatedTree["b"])
     }
 
     @Test
     fun `remove should do nothing if requested to remove an unexisting key`() {
-        val newTree = populatedTree.remove("aab")
-        assertEquals(null, newTree["aab"])
+        populatedTree.remove("aab")
+        assertEquals(null, populatedTree["aab"])
     }
 
     @Test
     fun `remove should do nothing on empty trees`() {
-        val newTree = emptyTree.remove("1")
-        assertEquals(null, newTree["1"])
+        emptyTree.remove("1")
+        assertEquals(null, emptyTree["1"])
     }
 
     @Test
     fun `remove should decrease size by 1 in populated tree`() {
-        val newTree = populatedTree.remove("a")
-        assertEquals(populatedTree.size - 1, newTree.size)
+        val oldSize = populatedTree.size
+        populatedTree.remove("a")
+        assertEquals(oldSize - 1, populatedTree.size)
     }
 
     @Test
     fun `remove should not change size if key is not present`() {
-        val newTree = populatedTree.remove("zyx")
-        assertEquals(populatedTree.size, newTree.size)
+        populatedTree.remove("zyx")
+        assertEquals(populatedTree.size, populatedTree.size)
     }
 
     @Test
     fun `remove should not change size of empty tree`() {
-        val newTree = emptyTree.remove("a")
-        assertEquals(0, newTree.size)
+        emptyTree.remove("a")
+        assertEquals(0, emptyTree.size)
     }
 
     // big tests
@@ -211,22 +226,22 @@ internal class ImmutableAVLTreeTest {
     @Test
     fun `remove should remove entry from big tree`() {
         val (tree, _) = generateBigTree(1000)
-        val newTree = tree.remove("key - 150")
-        assertFalse(newTree.containsKey("key - 150"))
+        tree.remove("key - 150")
+        assertFalse(tree.containsKey("key - 150"))
     }
 
     @Test
     fun `put should update entry in big tree`() {
         val (tree, _) = generateBigTree(1000)
-        val newTree = tree.put("key - 150", -1)
-        assertEquals(-1, newTree["key - 150"])
+        tree["key - 150"] = -1
+        assertEquals(-1, tree["key - 150"])
     }
 
     @Test
     fun `put should put new entries in big tree`() {
         val (tree, _) = generateBigTree(1000)
-        val newTree = tree.put("new key", -1)
-        assertEquals(-1, newTree["new key"])
+        tree["new key"] = -1
+        assertEquals(-1, tree["new key"])
     }
 
     @Test

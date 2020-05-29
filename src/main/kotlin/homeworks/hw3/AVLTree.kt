@@ -9,7 +9,7 @@ import kotlin.Comparator
  * @param K type of keys
  * @param V type of values
  */
-class ImmutableAVLTree<K, V> : Map<K, V> {
+class AVLTree<K, V> : MutableMap<K, V> {
 
     companion object {
         const val BALANCE_FACTOR_RIGHT_SUBTREE_TOO_HIGH = 2
@@ -30,19 +30,19 @@ class ImmutableAVLTree<K, V> : Map<K, V> {
     }
 
     private val comparator: Comparator<K>
-    private val root: Node<K, V>?
+    private var root: Node<K, V>?
 
-    override val entries: Set<Map.Entry<K, V>>
-        get() = root?.asSequence()?.toSet() ?: setOf()
+    override val entries: MutableSet<MutableMap.MutableEntry<K, V>>
+        get() = (root?.asSequence()?.toMutableSet<MutableMap.MutableEntry<K, V>>() ?: mutableSetOf())
 
-    override val keys: Set<K>
-        get() = root?.asSequence()?.map { it.key }?.toSet() ?: setOf()
+    override val keys: MutableSet<K>
+        get() = root?.asSequence()?.map { it.key }?.toMutableSet() ?: mutableSetOf()
 
     override val size: Int
         get() = root?.size ?: 0
 
-    override val values: Collection<V>
-        get() = root?.asSequence()?.map { it.value }?.toList() ?: setOf<V>()
+    override val values: MutableCollection<V>
+        get() = root?.asSequence()?.map { it.value }?.toMutableList() ?: mutableListOf()
 
     /**
      * Node of the ImmutableAVLTree, which is an entry of this tree
@@ -53,11 +53,11 @@ class ImmutableAVLTree<K, V> : Map<K, V> {
      */
     class Node<K, V>(
         override val key: K,
-        override val value: V,
+        override var value: V,
         private val comparator: Comparator<K>,
         val left: Node<K, V>? = null,
         val right: Node<K, V>? = null
-    ) : Iterable<Node<K, V>>, Map.Entry<K, V> {
+    ) : Iterable<Node<K, V>>, MutableMap.MutableEntry<K, V> {
 
         private val children: List<Node<K, V>>
             get() = listOfNotNull(left, right)
@@ -167,15 +167,6 @@ class ImmutableAVLTree<K, V> : Map<K, V> {
             return left.findNodeWithMinKey()
         }
 
-        private fun removeNodeWithMinKey(): Node<K, V>? {
-            if (left == null) {
-                // removes the current node
-                return right
-            }
-            val newLeft = left.removeNodeWithMinKey()
-            return Node(key, value, comparator, newLeft, right).balance()
-        }
-
         /**
          * Removes the entry with the following key
          * @param key of the entry that should be removed
@@ -189,7 +180,7 @@ class ImmutableAVLTree<K, V> : Map<K, V> {
                     left
                 } else {
                     val newRoot = right.findNodeWithMinKey()
-                    val newRight = right.removeNodeWithMinKey()
+                    val newRight = right.remove(newRoot.key)
 
                     Node(newRoot.key, newRoot.value, comparator, left, newRight).balance()
                 }
@@ -224,6 +215,12 @@ class ImmutableAVLTree<K, V> : Map<K, V> {
         override fun toString(): String {
             return "($key, $value)"
         }
+
+        override fun setValue(newValue: V): V {
+            val oldValue = value
+            value = newValue
+            return oldValue
+        }
     }
 
     override fun containsKey(key: K): Boolean {
@@ -249,15 +246,17 @@ class ImmutableAVLTree<K, V> : Map<K, V> {
      * @param value of the entry to put
      * @return new updated tree
      */
-    fun put(key: K, value: V): ImmutableAVLTree<K, V> {
+    override fun put(key: K, value: V): V? {
+        val treeRoot = root
         // tree is empty
-        if (root == null) {
-            val newRoot = Node(key, value, comparator)
-            return ImmutableAVLTree(comparator, newRoot)
+        return if (treeRoot == null) {
+            root = Node(key, value, comparator)
+            null
+        } else {
+            val prevValue = get(key)
+            root = treeRoot.set(key, value)
+            prevValue
         }
-        // tree is not empty
-        val newRoot = root.set(key, value)
-        return ImmutableAVLTree(comparator, newRoot)
     }
 
     /**
@@ -266,13 +265,24 @@ class ImmutableAVLTree<K, V> : Map<K, V> {
      * @param key of the entry that should be removed
      * @return new updated tree
      */
-    fun remove(key: K): ImmutableAVLTree<K, V> {
-        if (root == null || !containsKey(key)) {
-            return this
+    override fun remove(key: K): V? {
+        val treeRoot = root
+        val value = get(key)
+        return if (treeRoot == null || value == null) {
+            null
+        } else {
+            root = treeRoot.remove(key)
+            value
         }
-        // contains the key
-        // therefore root is not null
-        val newRoot = root.remove(key)
-        return ImmutableAVLTree(comparator, newRoot)
+    }
+
+    override fun clear() {
+        root = null
+    }
+
+    override fun putAll(from: Map<out K, V>) {
+        for ((key, value) in from.entries) {
+            put(key, value)
+        }
     }
 }
