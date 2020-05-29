@@ -6,17 +6,12 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.BeforeEach
 
 internal class AVLTreeTest {
+    private val emptyTree = AVLTree<String, Int>(naturalOrder())
 
-    private val stringComparator = Comparator<String> { str1, str2 -> str1.compareTo(str2) }
-
-    private val intComparator = Comparator<Int> { num1, num2 -> num1 - num2 }
-
-    private val emptyTree = AVLTree<String, Int>(stringComparator)
-
-    private val populatedTree = AVLTree<String, Int>(stringComparator)
+    private val populatedTree = AVLTree<String, Int>(naturalOrder())
 
     private fun generateBigTree(size: Int): Pair<AVLTree<String, Int>, Set<Pair<String, Int>>> {
-        val tree = AVLTree<String, Int>(stringComparator)
+        val tree = AVLTree<String, Int>(naturalOrder())
         val expectedEntries = mutableSetOf<Pair<String, Int>>()
         for (i in 1..size) {
             val curKey = "key - $i"

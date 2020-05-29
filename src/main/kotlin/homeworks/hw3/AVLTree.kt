@@ -161,10 +161,7 @@ class AVLTree<K, V> : MutableMap<K, V> {
         }
 
         private fun findNodeWithMinKey(): Node<K, V> {
-            if (left == null) {
-                return this
-            }
-            return left.findNodeWithMinKey()
+            return left?.findNodeWithMinKey() ?: this
         }
 
         /**

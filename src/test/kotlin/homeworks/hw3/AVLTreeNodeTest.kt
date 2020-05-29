@@ -9,19 +9,16 @@ import kotlin.math.abs
 import kotlin.math.max
 
 internal class AVLTreeNodeTest {
-
-    private val stringComparator = Comparator<String> { str1, str2 -> str1.compareTo(str2) }
-
-    private var root: AVLTree.Node<String, Int> = AVLTree.Node("k", 1, stringComparator)
+    private var root: AVLTree.Node<String, Int> = AVLTree.Node("k", 1, naturalOrder())
 
     init {
-        val leftChild = AVLTree.Node("a", 1, stringComparator)
-        val rightChildOfRightChild = AVLTree.Node("e", 5, stringComparator)
-        val leftChildOfRightChild = AVLTree.Node("c", 4, stringComparator)
+        val leftChild = AVLTree.Node("a", 1, naturalOrder())
+        val rightChildOfRightChild = AVLTree.Node("e", 5, naturalOrder())
+        val leftChildOfRightChild = AVLTree.Node("c", 4, naturalOrder())
         val rightChild = AVLTree.Node(
-            "d", 3, stringComparator, leftChildOfRightChild, rightChildOfRightChild
+            "d", 3, naturalOrder(), leftChildOfRightChild, rightChildOfRightChild
         )
-        root = AVLTree.Node("b", 2, stringComparator, leftChild, rightChild)
+        root = AVLTree.Node("b", 2, naturalOrder(), leftChild, rightChild)
     }
 
     // returns -1 if the subtree is not balanced
@@ -41,7 +38,7 @@ internal class AVLTreeNodeTest {
     }
 
     private fun buildBigTree(size: Int): AVLTree.Node<String, Int> {
-        var node = AVLTree.Node<String, Int>("0", 0, stringComparator)
+        var node = AVLTree.Node<String, Int>("0", 0, naturalOrder())
         for (i in 1..size) {
             node = node.set("key-$i", i)
         }
