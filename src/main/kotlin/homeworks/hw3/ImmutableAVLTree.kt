@@ -5,7 +5,7 @@ import java.util.Stack
 import kotlin.Comparator
 
 /**
- * AVLTree implementation of Map
+ * AVLTree implementation of MutableMap
  * @param K type of keys
  * @param V type of values
  */
