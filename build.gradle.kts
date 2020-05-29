@@ -30,7 +30,7 @@ dependencies {
 }
 
 javafx {
-    modules("javafx.controls", "javafx.fxml")
+    modules("javafx.controls")
 }
 
 detekt {
