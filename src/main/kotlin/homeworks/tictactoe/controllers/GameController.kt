@@ -61,4 +61,12 @@ class GameController(private val gameModel: GameWithFriendModel) : Controller() 
             }
         }
     }
+
+    fun onError(listener: (String) -> Unit) {
+        gameModel.errorMessageProperty.addListener { _, _, newValue ->
+            if (newValue != null) {
+                listener(newValue)
+            }
+        }
+    }
 }

@@ -5,6 +5,7 @@ import TicTacToeApp.Companion.FIELD_SIZE
 import homeworks.tictactoe.getFirstCapturedLine
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
+import javafx.beans.property.SimpleStringProperty
 import tornadofx.setValue
 import tornadofx.getValue
 import java.lang.IllegalArgumentException
@@ -23,6 +24,9 @@ open class GameWithFriendModel {
 
     val waitingProperty = SimpleBooleanProperty(true)
     var waiting by waitingProperty
+
+    val errorMessageProperty = SimpleStringProperty(null)
+    var errorMessage by errorMessageProperty
 
     fun startGame() {
         activePlayer = 0
@@ -54,7 +58,7 @@ open class GameWithFriendModel {
         }
     }
 
-    private fun commitTurn(position: Int) {
+    open fun commitTurn(position: Int) {
         field[position].set(activePlayer)
     }
 

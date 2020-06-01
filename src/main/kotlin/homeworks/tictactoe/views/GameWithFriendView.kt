@@ -35,11 +35,14 @@ class GameWithFriendView : View("Game") {
         controller.onVictory { player ->
             showEndGameMessage("${controller.getPlayerFigure(player).toUpperCase()}'s win")
         }
+        controller.onError {
+            showEndGameMessage(it)
+        }
         controller.startGame()
     }
 
     private fun showEndGameMessage(text: String) {
-        alert(Alert.AlertType.INFORMATION, text, "Press OK to return to the main menu", ButtonType.OK, actionFn = {
+        alert(Alert.AlertType.INFORMATION, text, "Return to the main menu", ButtonType.OK, actionFn = {
             replaceWith<MainMenuView>()
         })
     }

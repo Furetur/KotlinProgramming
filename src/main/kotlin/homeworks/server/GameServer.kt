@@ -1,28 +1,24 @@
 package homeworks.server
 
+import TicTacToeApp.Companion.FIELD_LINEAR_SIZE
 import TicTacToeApp.Companion.FIELD_SIZE
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.websocket.WebSocketServerSession
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.lang.IllegalArgumentException
 
 class GameServer {
-    val field = MutableList(FIELD_SIZE) { -1 }
-    val players = MutableList<PlayerData?>(2) { null }
+    private val field = MutableList(FIELD_SIZE) { -1 }
+    private val players = MutableList<PlayerData?>(2) { null }
     var activePlayer = -1
     var gameOn = false
 
-    val playersConnected: Int
+    private val playersConnected: Int
         get() = players.count { it != null }
 
-    fun getOtherPlayer(player: PlayerData): PlayerData? {
-        val otherId = 1 - player.id
-        return players[otherId]
-    }
+    class PlayerData(val id: Int, val session: WebSocketServerSession)
 
-    fun getPlayerBySession(session: WebSocketServerSession): PlayerData? {
+    private fun getPlayerBySession(session: WebSocketServerSession): PlayerData? {
         return players.filterNotNull().find { it.session == session }
     }
 
@@ -33,10 +29,13 @@ class GameServer {
         val freePlayerId = players.indexOf(null)
         val playerData = PlayerData(freePlayerId, session)
         players[freePlayerId] = playerData
+        return playerData
+    }
+
+    fun tryStartGame() {
         if (playersConnected == 2) {
             startGame()
         }
-        return playerData
     }
 
     fun playerDisconnect(session: WebSocketServerSession) {
@@ -45,23 +44,25 @@ class GameServer {
             ?: return
         players[playerData.id] = null
         if (gameOn) {
-            endGame()
+            endGameBecauseOnePlayerDisconnected()
         }
     }
 
-    fun startGame() {
+    private fun startGame() {
         gameOn = true
         activePlayer = 0
         notifyEach { "gameStarted ${it.id}" }
+        println("Game started")
     }
 
-    fun endGame() {
+    private fun endGameBecauseOnePlayerDisconnected() {
         gameOn = false
         activePlayer = -1
         for (i in 0 until FIELD_SIZE) {
             field[i] = -1
         }
-        notifyAll("gameEnded")
+        notifyAll("otherPlayerDisconnected")
+        println("Ending the game: one player disconnected")
     }
 
     fun handleTurn(session: WebSocketServerSession, position: Int) {
@@ -71,19 +72,19 @@ class GameServer {
             activePlayer = 1 - activePlayer
             notifyAll("turn ${player.id} $position")
             println("Turn made by ${player.id} to position $position")
-            println("Current field\n${field.chunked(3).joinToString("\n")}")
+            println("Current field\n${field.chunked(FIELD_LINEAR_SIZE).joinToString("\n")}")
         }
     }
 
-    fun isTurnValid(player: PlayerData, position: Int): Boolean {
+    private fun isTurnValid(player: PlayerData, position: Int): Boolean {
         return field[position] == -1 && activePlayer == player.id
     }
 
-    fun notifyAll(message: String) {
+    private fun notifyAll(message: String) {
         notifyEach { message }
     }
 
-    fun notifyEach(messageBuilder: (PlayerData) -> String) = runBlocking {
+    private fun notifyEach(messageBuilder: (PlayerData) -> String) = runBlocking {
         for (playerData in players.filterNotNull()) {
             val message = messageBuilder(playerData)
             launch { playerData.session.send(Frame.Text(message)) }

@@ -1,23 +1,25 @@
 package homeworks.server
 
-import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.readText
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import io.ktor.sessions.sessions
 import io.ktor.websocket.WebSocketServerSession
 import io.ktor.websocket.WebSockets
 import io.ktor.websocket.webSocket
-import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import java.lang.IllegalArgumentException
 
 class GameApplication {
     val server = GameServer()
 
-    fun handleTurn(session: WebSocketServerSession, message: String) {
+    companion object {
+        const val HOST = "127.0.0.1"
+        const val PORT = 8080
+    }
+
+    private fun handleTurn(session: WebSocketServerSession, message: String) {
         val tokens = message.split(" ")
         if (tokens.size < 2) {
             throw IllegalArgumentException("Message does not contain the position")
@@ -26,35 +28,41 @@ class GameApplication {
         server.handleTurn(session, position)
     }
 
-    fun handleMessage(session: WebSocketServerSession, message: String) {
+    private fun handleMessage(session: WebSocketServerSession, message: String) {
         println("Message received: $message")
         when {
             message.startsWith("turn") -> handleTurn(session, message)
         }
     }
 
-    fun handleConnect(session: WebSocketServerSession) {
-        println("Client connected")
-        server.playerConnect(session)
+    private fun handleConnect(session: WebSocketServerSession) {
+        val playerData = server.playerConnect(session)
+        if (playerData == null) {
+            println("Client connected but was ignored")
+        } else {
+            println("Client connected and received id ${playerData.id}")
+        }
+        server.tryStartGame()
     }
 
-    fun handleDisconnect(session: WebSocketServerSession) {
+    private fun handleDisconnect(session: WebSocketServerSession) {
+        println("Client disconnected")
         server.playerDisconnect(session)
     }
 
     fun start() {
-        embeddedServer(Netty, 8080) {
+        embeddedServer(Netty, PORT) {
             install(WebSockets)
             routing {
                 webSocket("/") {
+                    handleConnect(this)
                     try {
-                        handleConnect(this)
                         for (frame in incoming) {
                             if (frame is Frame.Text) {
                                 handleMessage(this, frame.readText())
                             }
                         }
-                    } catch(e: ClosedReceiveChannelException) {
+                    } finally {
                         handleDisconnect(this)
                     }
                 }
