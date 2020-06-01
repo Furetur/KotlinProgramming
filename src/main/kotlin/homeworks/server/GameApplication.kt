@@ -2,6 +2,7 @@ package homeworks.server
 
 import io.ktor.application.install
 import io.ktor.http.cio.websocket.Frame
+import io.ktor.http.cio.websocket.close
 import io.ktor.http.cio.websocket.readText
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
@@ -9,6 +10,8 @@ import io.ktor.server.netty.Netty
 import io.ktor.websocket.WebSocketServerSession
 import io.ktor.websocket.WebSockets
 import io.ktor.websocket.webSocket
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 
 class GameApplication {
@@ -38,11 +41,10 @@ class GameApplication {
     private fun handleConnect(session: WebSocketServerSession) {
         val playerData = server.playerConnect(session)
         if (playerData == null) {
-            println("Client connected but was ignored")
-        } else {
-            println("Client connected and received id ${playerData.id}")
+            GlobalScope.launch {
+                session.close()
+            }
         }
-        server.tryStartGame()
     }
 
     private fun handleDisconnect(session: WebSocketServerSession) {

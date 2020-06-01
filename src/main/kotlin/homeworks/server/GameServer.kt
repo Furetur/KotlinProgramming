@@ -23,6 +23,19 @@ class GameServer {
     }
 
     fun playerConnect(session: WebSocketServerSession): PlayerData? {
+        val playerData = registerNewClient(session)
+        if (playerData == null) {
+            println("Client connected but was ignored")
+        } else {
+            println("Client connected and received id ${playerData.id}")
+            if (playersConnected == 2) {
+                startGame()
+            }
+        }
+        return playerData
+    }
+
+    fun registerNewClient(session: WebSocketServerSession): PlayerData? {
         if (playersConnected == 2) {
             return null
         }
@@ -30,12 +43,6 @@ class GameServer {
         val playerData = PlayerData(freePlayerId, session)
         players[freePlayerId] = playerData
         return playerData
-    }
-
-    fun tryStartGame() {
-        if (playersConnected == 2) {
-            startGame()
-        }
     }
 
     fun playerDisconnect(session: WebSocketServerSession) {
