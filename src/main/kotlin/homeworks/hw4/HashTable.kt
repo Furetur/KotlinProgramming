@@ -1,8 +1,13 @@
 package homeworks.hw4
 
+import homeworks.hw4.hashfunctions.HashFunction
 import java.lang.IllegalArgumentException
 
-class HashTable<K, V>(hashFunction: (K) -> Int, private val tableSize: Int = 51) : MutableMap<K, V> {
+class HashTable<K, V>(hashFunction: HashFunction<K>, private var initialNumberOfBuckets: Int = 51) : MutableMap<K, V> {
+    companion object {
+        const val loadFactorThreshold = .75
+        const val expansionMultiplier = .5
+    }
 
     class HashTableEntry<K, V>(override val key: K, value: V) : MutableMap.MutableEntry<K, V> {
         override val value: V
@@ -17,48 +22,70 @@ class HashTable<K, V>(hashFunction: (K) -> Int, private val tableSize: Int = 51)
         }
     }
 
-    private var table = Array(tableSize) { mutableListOf<HashTableEntry<K, V>>() }
-    private var itemsCount = 0
+    inner class BucketsManager {
+        private var buckets = Array(initialNumberOfBuckets) { mutableListOf<HashTableEntry<K, V>>() }
 
-    init {
-        if (tableSize < 2) {
-            throw IllegalArgumentException("Table size cannot be < 1")
+        val numberOfBuckets: Int
+            get() = buckets.size
+
+        val notEmptyBuckets = buckets.filter { it.size > 0 }
+
+        fun getBucket(key: K): MutableList<HashTableEntry<K, V>> {
+            val hash = hashFunction.apply(key) % numberOfBuckets
+            return buckets[hash]
+        }
+
+        fun getEntry(key: K): HashTableEntry<K, V>? {
+            val itemsWithThisHash = bucketsManager.getBucket(key)
+            return itemsWithThisHash.find { item -> item.key == key }
+        }
+
+        fun clear() {
+            for (bucket in buckets) {
+                bucket.clear()
+            }
+        }
+
+        fun expand() {
+            val numberOfBucketsToAdd = (numberOfBuckets * expansionMultiplier).toInt()
+            buckets = buckets.copyOf(numberOfBuckets + numberOfBucketsToAdd)
+                .map { it ?: mutableListOf() }.toTypedArray()
+            rehash()
         }
     }
 
-    var hashFunction: (K) -> Int = hashFunction
+    private val bucketsManager = BucketsManager()
+
+    init {
+        if (initialNumberOfBuckets < 2) {
+            throw IllegalArgumentException("Number of buckets cannot be < 2")
+        }
+    }
+
+    var hashFunction: HashFunction<K> = hashFunction
         set(function) {
             field = function
-            // rehash
-            val entries = entries
-            clear()
-            for (entry in entries) {
-                put(entry.key, entry.value)
-            }
+            rehash()
         }
     override val size: Int
-        get() = itemsCount
-    override val entries: MutableSet<MutableMap.MutableEntry<K, V>>
-        get() = table.filter { cell -> cell.size > 0 }.flatten().toMutableSet()
+        get() = entries.size
+    override val entries = mutableSetOf<MutableMap.MutableEntry<K, V>>()
     override val keys: MutableSet<K>
         get() = entries.map { entry -> entry.key }.toMutableSet()
     override val values: MutableCollection<V>
         get() = entries.map { entry -> entry.value }.toMutableSet()
     val occupiedCellsCount: Int
-        get() = table.filter { cell -> cell.size > 0 }.size
+        get() = bucketsManager.notEmptyBuckets.size
+    val conflictsNumber: Int
+        get() = bucketsManager.notEmptyBuckets.map { it.size - 1 }.sum()
     val maxConflictsForKey: Int
-        get() = table.map { cell -> cell.size }.max()!!
+        get() = bucketsManager.notEmptyBuckets.map { it.size }.max() ?: 0
 
     val loadFactor: Float
-        get() = occupiedCellsCount.toFloat() / tableSize
-
-    private fun getCellByKey(key: K): MutableList<HashTableEntry<K, V>> {
-        val hash = hashFunction(key) % tableSize
-        return table[hash]
-    }
+        get() = size.toFloat() / bucketsManager.numberOfBuckets
 
     override fun containsKey(key: K): Boolean {
-        val itemsWithThisHash = getCellByKey(key)
+        val itemsWithThisHash = bucketsManager.getBucket(key)
         return itemsWithThisHash.any { item -> item.key == key }
     }
 
@@ -66,13 +93,8 @@ class HashTable<K, V>(hashFunction: (K) -> Int, private val tableSize: Int = 51)
         return entries.any { entry -> entry.value == value }
     }
 
-    private fun getEntry(key: K): HashTableEntry<K, V>? {
-        val itemsWithThisHash = getCellByKey(key)
-        return itemsWithThisHash.find { item -> item.key == key }
-    }
-
     override fun get(key: K): V? {
-        return getEntry(key)?.value
+        return bucketsManager.getEntry(key)?.value
     }
 
     override fun isEmpty(): Boolean {
@@ -80,21 +102,21 @@ class HashTable<K, V>(hashFunction: (K) -> Int, private val tableSize: Int = 51)
     }
 
     override fun clear() {
-        // empty table
-        for (cell in table) {
-            cell.clear()
-        }
-        itemsCount = 0
+        bucketsManager.clear()
+        entries.clear()
     }
 
     override fun put(key: K, value: V): V? {
-        val itemWithThisKey = getEntry(key)
+        val itemWithThisKey = bucketsManager.getEntry(key)
 
         return if (itemWithThisKey == null) {
-            val itemsWithThisHash = getCellByKey(key)
+            val itemsWithThisHash = bucketsManager.getBucket(key)
             val newItem = HashTableEntry(key, value)
             itemsWithThisHash.add(newItem)
-            itemsCount++
+            entries.add(newItem)
+            if (loadFactor >= loadFactorThreshold) {
+                bucketsManager.expand()
+            }
             null
         } else {
             itemWithThisKey.setValue(value)
@@ -108,14 +130,22 @@ class HashTable<K, V>(hashFunction: (K) -> Int, private val tableSize: Int = 51)
     }
 
     override fun remove(key: K): V? {
-        val itemWithThisKey = getEntry(key)
+        val itemWithThisKey = bucketsManager.getEntry(key)
         return if (itemWithThisKey == null) {
             null
         } else {
-            val itemsWithThisHash = getCellByKey(key)
+            val itemsWithThisHash = bucketsManager.getBucket(key)
             itemsWithThisHash.remove(itemWithThisKey)
-            itemsCount--
+            entries.remove(itemWithThisKey)
             itemWithThisKey.value
+        }
+    }
+
+    private fun rehash() {
+        val savedEntries = entries.toSet()
+        clear()
+        for ((key, value) in savedEntries) {
+            put(key, value)
         }
     }
 }

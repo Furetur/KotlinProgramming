@@ -1,17 +1,18 @@
 package homeworks.hw4
 
+import homeworks.hw4.TextCommandRunner.Companion.defaultHashFunction
+import homeworks.hw4.TextCommandRunner.Companion.trivialHashFunction
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 internal class HashTableTest {
-    var hashTable = HashTable<String, String>(pearsonHash)
+    var hashTable = HashTable<String, String>(defaultHashFunction)
 
     @BeforeEach
     fun init() {
-        hashTable = HashTable(pearsonHash)
+        hashTable = HashTable(defaultHashFunction)
     }
 
     @Test
@@ -177,7 +178,7 @@ internal class HashTableTest {
             hashTable["key$i"] = "val$i"
             expectedValues.add("val$i")
         }
-        hashTable.hashFunction = trivialHash
+        hashTable.hashFunction = trivialHashFunction
         val actualValues = mutableListOf<String>()
         for (i in 0..100) {
             actualValues.add(hashTable["key$i"] ?: "null")
@@ -191,8 +192,8 @@ internal class HashTableTest {
             hashTable["key$i"] = "val$i"
         }
         val oldLoadFactor = hashTable.loadFactor
-        hashTable.hashFunction = trivialHash
-        assertNotEquals(oldLoadFactor, hashTable.loadFactor)
+        hashTable.hashFunction = trivialHashFunction
+        assertEquals(oldLoadFactor, hashTable.loadFactor)
     }
 
     @Test

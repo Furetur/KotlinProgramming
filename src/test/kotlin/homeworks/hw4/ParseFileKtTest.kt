@@ -71,21 +71,21 @@ internal class ParseFileKtTest {
             Pair("k3", "v3"),
             Pair("k4", "     v4")
         )
-        val file = File("./src/test/kotlin/homeworks/hw4/test1.txt")
+        val file = File("./src/test/resources/homeworks/hw4/test1.txt")
         val actualPairs = parseFile(file)
         assertEquals(expectedPairs, actualPairs)
     }
 
     @Test
     fun `should correctly parse empty files`() {
-        val file = File("./src/test/kotlin/homeworks/hw4/empty.txt")
+        val file = File("./src/test/resources/homeworks/hw4/empty.txt")
         val actualPairs = parseFile(file)
         assertEquals(0, actualPairs.size)
     }
 
     @Test
     fun `should throw if file contains syntax errors`() {
-        val file = File("./src/test/kotlin/homeworks/hw4/file3.txt")
+        val file = File("./src/test/resources/homeworks/hw4/file3.txt")
         assertThrows(WrongFileSyntax::class.java) {
             parseFile(file)
         }
