@@ -12,7 +12,6 @@ class ExpressionTree(private val root: Node) {
 
     interface Node {
         fun evaluate(): Double
-        override fun toString(): String
     }
 
     class OperatorNode(val operator: Char, val operand1: Node, val operand2: Node) : Node {
