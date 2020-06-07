@@ -1,7 +1,6 @@
 package homeworks.hw4.hashfunctions
 
-class TrivialHashFunction(private val shiftSize: Int, private val modulo: Int) :
-    HashFunction<String> {
+class TrivialHashFunction(private val shiftSize: Int, private val modulo: Int) : HashFunction<String> {
 
     override val name = "Trivial Hash Function"
 

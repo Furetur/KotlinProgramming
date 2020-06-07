@@ -2,8 +2,7 @@ package homeworks.hw4.textcommands
 
 import homeworks.hw4.HashTable
 
-class GetCommand(command: String) :
-    TextCommand<String, String>("get", requiredArgumentsNumber, command) {
+class GetCommand(command: String) : TextCommand<String, String>("get", requiredArgumentsNumber, command) {
 
     companion object {
         const val name = "get"

@@ -2,8 +2,7 @@ package homeworks.hw4.hashfunctions
 
 import homeworks.hw4.TextCommandRunner.Companion.PEARSON_RESOLUTION
 
-class PearsonHashFunction(private val resolution: Int, private val modulo: Int) :
-    HashFunction<String> {
+class PearsonHashFunction(private val resolution: Int, private val modulo: Int) : HashFunction<String> {
 
     override val name = "Pearson Hash Function"
 

@@ -1,7 +1,6 @@
 package homeworks.hw4.hashfunctions
 
-class PolynomialHashFunction(private val prime: Int, private val modulo: Int) :
-    HashFunction<String> {
+class PolynomialHashFunction(private val prime: Int, private val modulo: Int) : HashFunction<String> {
 
     companion object {
         const val name = "P"
