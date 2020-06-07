@@ -2,9 +2,11 @@ package homeworks.hw4.task2
 
 import java.lang.IllegalArgumentException
 
-val supportedOperators = listOf('+', '/', '-', '*')
-
 class ExpressionTree(private val root: Node) {
+
+    companion object {
+        val supportedOperators = listOf('+', '/', '-', '*')
+    }
 
     class UnsupportedOperatorException(message: String) : IllegalArgumentException(message)
 
