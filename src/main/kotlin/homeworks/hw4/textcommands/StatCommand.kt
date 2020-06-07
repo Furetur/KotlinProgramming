@@ -10,6 +10,7 @@ class StatCommand(command: String) : TextCommand<String, String>(name, requiredA
 
     override fun apply(hashTable: HashTable<String, String>): String {
         return "Occupied Cells: ${hashTable.occupiedCellsCount}. Load factor: ${hashTable.loadFactor}. " +
-                "Max conflicts in one cell: ${hashTable.maxConflictsForKey}"
+                "Max conflicts in one cell: ${hashTable.maxConflictsForKey}. " +
+                "Total number of conflicts: ${hashTable.conflictsNumber}"
     }
 }
