@@ -36,18 +36,13 @@ fun measureOnShuffledList(size: Int): Pair<Long, Long> {
     return measureTime(list)
 }
 
-fun getRandomString(): String {
-    val letters = mutableListOf<Char>(
-        'a', 'b', 'c', 'd', 'e', 'f', 'g',
-        'h', 'i', 'j', 'k', 'l',
-        'm', 'n', 'o', 'p', 'q', 'r', 's',
-        't', 'u', 'v', 'w', 'x', 'y', 'z'
-    )
+fun getRandomLettersPermutation(): String {
+    val letters = ('a'..'z').toMutableList()
     letters.shuffle()
     return letters.joinToString("")
 }
 
 fun measureOnStringList(size: Int): Pair<Long, Long> {
-    val list = MutableList(size) { getRandomString() }
+    val list = MutableList(size) { getRandomLettersPermutation() }
     return measureTime(list)
 }
