@@ -13,10 +13,9 @@ class FileCommand(val command: String) : TextCommand<String, String>(name, requi
     }
 
     private val filename = arguments[0]
-    private val filepath = "./src/main/resources/homeworks/hw4/$filename"
 
     override fun apply(hashTable: HashTable<String, String>): String {
-        val file = File(filepath)
+        val file = File(filename)
         if (!file.exists()) {
             throw FileNotFoundException()
         }

@@ -12,10 +12,7 @@ fun main() {
     println("HashTable Interactive Mode:")
     println("get K                     --- get an item from the hash table or null if no item is found")
     println("put K V                   --- put (K, V) into the hash table")
-    println(
-        "file FILENAME             --- populate hash table from a file that should have `key: value` lines\n" +
-                "\t\t\t\t\t\t\t\tFILENAME should point to a file that is located in the resources/homeworks/hw4 folder"
-    )
+    println("file FILENAME             --- populate hash table from a file that should have `key: value` lines")
     println("remove K                  --- remove key-value pair with this key from the hash table")
     println("clear                     --- remove everything from the hash table")
     println("hash HASH_FUNCTION_NUMBER --- change the hash function")
