@@ -34,11 +34,8 @@ class ExpressionTree(private val root: Node) {
         }
 
         override fun equals(other: Any?): Boolean {
-            return if (other !is OperatorNode) {
-                 false
-            } else {
-                operator == other.operator && operand1 == other.operand1 && operand2 == other.operand2
-            }
+            return (other is OperatorNode) &&
+                    (operator == other.operator && operand1 == other.operand1 && operand2 == other.operand2)
         }
 
         override fun hashCode(): Int {
@@ -59,11 +56,7 @@ class ExpressionTree(private val root: Node) {
         }
 
         override fun equals(other: Any?): Boolean {
-            return if (other !is ValueNode) {
-                false
-            } else {
-                value == other.value
-            }
+            return (other is ValueNode) && (value == other.value)
         }
 
         override fun hashCode(): Int {
@@ -78,11 +71,7 @@ class ExpressionTree(private val root: Node) {
     override fun toString(): String = root.toString()
 
     override fun equals(other: Any?): Boolean {
-        return if (other !is ExpressionTree) {
-            false
-        } else {
-            root == other.root
-        }
+        return (other is ExpressionTree) && (root == other.root)
     }
 
     override fun hashCode(): Int {
