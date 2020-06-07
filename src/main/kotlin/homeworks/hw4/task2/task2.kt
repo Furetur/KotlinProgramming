@@ -11,7 +11,7 @@ fun readFirstLineFromFile(file: File): String {
 fun main() {
     println("This program reads data from a text file. And parses its data as an expression tree")
 
-    val file = File("./src/main/kotlin/homeworks/hw4/task2/$FILENAME")
+    val file = File("./src/main/resources/homeworks/hw4/task2/$FILENAME")
 
     if (!file.exists()) {
         println("File not found")
