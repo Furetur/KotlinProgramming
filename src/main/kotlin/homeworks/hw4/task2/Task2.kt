@@ -23,10 +23,10 @@ fun main() {
     val input = readFirstLineFromFile(file)
 
     try {
-        val tree = parseExpressionTree(input)
+        val tree = ExpressionTreeBuilder(input).parseExpressionTree()
         println("Received tree: $tree")
         println("Tree evaluates to: ${tree.evaluate()}")
-    } catch (e: IllegalStringSyntax) {
+    } catch (e: ExpressionTreeBuilder.IllegalStringSyntax) {
         println("Wrong syntax of $FILENAME:\n\t${e.message}")
     } catch (e: ExpressionTree.UnsupportedOperatorException) {
         println("Wrong syntax of $FILENAME:\n\t${e.message}")
