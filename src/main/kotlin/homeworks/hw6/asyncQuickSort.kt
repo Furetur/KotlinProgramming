@@ -3,7 +3,7 @@ package homeworks.hw6
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
-suspend fun <E : Comparable<E>> asyncQuicksort(list: MutableList<E>, left: Int = 0, right: Int = list.size) {
+suspend fun <E : Comparable<E>> asyncQuicksort(list: MutableList<E>, left: Int = 0, right: Int = list.size): Unit =
     coroutineScope {
         if (list.isEmpty() || left >= right) {
             return@coroutineScope
@@ -17,4 +17,3 @@ suspend fun <E : Comparable<E>> asyncQuicksort(list: MutableList<E>, left: Int =
             asyncQuicksort(currentSubList, newPivotIndex + 1)
         }
     }
-}
