@@ -1,100 +1,167 @@
 package homeworks.server
 
-import TicTacToeApp.Companion.FIELD_LINEAR_SIZE
-import TicTacToeApp.Companion.FIELD_SIZE
+import homeworks.utils.getMessageIntArguments
+import io.ktor.application.install
 import io.ktor.http.cio.websocket.Frame
+import io.ktor.http.cio.websocket.close
+import io.ktor.http.cio.websocket.readText
+import io.ktor.routing.routing
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.netty.Netty
 import io.ktor.websocket.WebSocketServerSession
+import io.ktor.websocket.WebSockets
+import io.ktor.websocket.webSocket
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.lang.IllegalArgumentException
+import java.lang.IllegalStateException
 
 class GameServer {
-    private val field = MutableList(FIELD_SIZE) { -1 }
-    private val players = MutableList<PlayerData?>(2) { null }
-    var activePlayer = -1
-    var gameOn = false
 
-    private val playersConnected: Int
-        get() = players.count { it != null }
+    private val playersManager = PlayersManager()
+    var game: ServerGameLoop = ServerGameLoop(playersManager)
 
-    class PlayerData(val id: Int, val session: WebSocketServerSession)
-
-    private fun getPlayerBySession(session: WebSocketServerSession): PlayerData? {
-        return players.filterNotNull().find { it.session == session }
+    companion object {
+        const val HOST = "127.0.0.1"
+        const val PORT = 8080
     }
 
-    fun playerConnect(session: WebSocketServerSession): PlayerData? {
-        val playerData = registerNewClient(session)
-        if (playerData == null) {
-            println("Client connected but was ignored")
+    fun start() {
+        embeddedServer(Netty, PORT) {
+            install(WebSockets)
+            routing {
+                webSocket("/") {
+                    handleConnect(this)
+                    try {
+                        for (frame in incoming) {
+                            if (frame is Frame.Text) {
+                                handleMessage(this, frame.readText())
+                            }
+                        }
+                    } finally {
+                        handleDisconnect(this)
+                    }
+                }
+            }
+        }.start(wait = true)
+    }
+
+    private fun handleConnect(session: WebSocketServerSession) {
+        if (playersManager.isFull) {
+            println("Player connected but was kicked")
+            GlobalScope.launch {
+                disconnectClient(session)
+            }
         } else {
-            println("Client connected and received id ${playerData.id}")
-            if (playersConnected == 2) {
-                startGame()
+            val playerId = playersManager.connectPlayer(session)
+            println("Player connected and received id=$playerId")
+            if (playersManager.isFull) {
+                game.onGameStart()
             }
         }
-        return playerData
     }
 
-    fun registerNewClient(session: WebSocketServerSession): PlayerData? {
-        if (playersConnected == 2) {
-            return null
+    private suspend fun disconnectClient(session: WebSocketServerSession) {
+        println("Disconnecting client")
+        session.close()
+    }
+
+    private fun handleDisconnect(session: WebSocketServerSession) {
+        if (!playersManager.isPlayerConnected(session)) {
+            println("Client disconnected - they were not in the lobby")
+            return
         }
-        val freePlayerId = players.indexOf(null)
-        val playerData = PlayerData(freePlayerId, session)
-        players[freePlayerId] = playerData
-        return playerData
-    }
-
-    fun playerDisconnect(session: WebSocketServerSession) {
-        val playerData = getPlayerBySession(session)
-        // player is not in game
-            ?: return
-        players[playerData.id] = null
-        if (gameOn) {
-            endGameBecauseOnePlayerDisconnected()
+        val playerId = playersManager.forgetPlayer(session)
+        println("Player #$playerId disconnected")
+        if (game.gameOn) {
+            game.onPlayerDisconnected(playerId)
         }
     }
 
-    private fun startGame() {
-        gameOn = true
-        activePlayer = 0
-        notifyEach { "gameStarted ${it.id}" }
-        println("Game started")
-    }
-
-    private fun endGameBecauseOnePlayerDisconnected() {
-        gameOn = false
-        activePlayer = -1
-        for (i in 0 until FIELD_SIZE) {
-            field[i] = -1
-        }
-        notifyAll("otherPlayerDisconnected")
-        println("Ending the game: one player disconnected")
-    }
-
-    fun handleTurn(session: WebSocketServerSession, position: Int) {
-        val player = getPlayerBySession(session)
-        if (player != null && isTurnValid(player, position)) {
-            field[position] = player.id
-            activePlayer = 1 - activePlayer
-            notifyAll("turn ${player.id} $position")
-            println("Turn made by ${player.id} to position $position")
-            println("Current field\n${field.chunked(FIELD_LINEAR_SIZE).joinToString("\n")}")
+    private fun handleMessage(session: WebSocketServerSession, message: String) {
+        println("Message received: $message")
+        try {
+            if (message.startsWith("turn")) {
+                handleTurnMessage(session, message)
+            }
+        } catch (e: IllegalArgumentException) {
+            println("IllegalArgumentException thrown during message handling $e")
+        } catch (e: IllegalStateException) {
+            println("IllegalStateException thrown during message handling $e")
         }
     }
 
-    private fun isTurnValid(player: PlayerData, position: Int): Boolean {
-        return field[position] == -1 && activePlayer == player.id
+    private fun handleTurnMessage(session: WebSocketServerSession, message: String) {
+        val position = getMessageIntArguments(message, 1)[0]
+        if (!playersManager.isPlayerConnected(session)) {
+            throw PlayerNotInLobbyException()
+        }
+        val playerId = playersManager.getPlayerId(session)
+        game.makeTurn(playerId, position)
     }
 
-    private fun notifyAll(message: String) {
-        notifyEach { message }
-    }
+    inner class PlayersManager {
+        private val players: MutableList<WebSocketServerSession?> = MutableList(2) { null }
+        val isFull: Boolean
+            get() = !players.contains(null)
+        private val connectedPlayersIds: List<Int>
+            get() = players.withIndex().filter { it.value != null }.map { it.index }
 
-    private fun notifyEach(messageBuilder: (PlayerData) -> String) = runBlocking {
-        for (playerData in players.filterNotNull()) {
-            val message = messageBuilder(playerData)
-            launch { playerData.session.send(Frame.Text(message)) }
+        fun connectPlayer(session: WebSocketServerSession): Int {
+            if (isFull) {
+                throw LobbyIsFullException()
+            }
+            val playerId = players.indexOf(null)
+            players[playerId] = session
+            return playerId
+        }
+
+        fun getPlayerId(session: WebSocketServerSession): Int {
+            return players.indexOf(session)
+        }
+
+        fun isPlayerConnected(session: WebSocketServerSession): Boolean {
+            return players.indexOf(session) != -1
+        }
+
+        fun forgetPlayer(session: WebSocketServerSession): Int {
+            val playerId = players.indexOf(session)
+            if (playerId == -1) {
+                throw IllegalArgumentException("Player not in game")
+            }
+            players[playerId] = null
+            return playerId
+        }
+
+        fun notifyAll(message: String) {
+            notifyEach { message }
+        }
+
+        fun notifyEach(messageBuilder: (Int) -> String) = runBlocking {
+            for (playerId in connectedPlayersIds) {
+                val message = messageBuilder(playerId)
+                println("Sending message='$message' to player #$playerId")
+                launch { players[playerId]?.send(Frame.Text(message)) }
+            }
+        }
+
+        suspend fun kick(playerId: Int) {
+            val session = players[playerId] ?: throw PlayerNotInLobbyException()
+            println("Kicking player #$playerId")
+            forgetPlayer(session)
+            disconnectClient(session)
+        }
+
+        fun kickAll() {
+            println("Kicking all players")
+            for (playerId in connectedPlayersIds) {
+                GlobalScope.launch { kick(playerId) }
+            }
         }
     }
+
+    class LobbyIsFullException : IllegalStateException()
+
+    class PlayerNotInLobbyException : IllegalArgumentException()
 }

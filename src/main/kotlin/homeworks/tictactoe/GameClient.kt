@@ -1,7 +1,7 @@
 package homeworks.tictactoe
 
-import homeworks.server.GameApplication.Companion.HOST
-import homeworks.server.GameApplication.Companion.PORT
+import homeworks.server.GameServer.Companion.HOST
+import homeworks.server.GameServer.Companion.PORT
 import io.ktor.client.HttpClient
 import io.ktor.client.features.websocket.WebSockets
 import io.ktor.client.features.websocket.ws
@@ -23,6 +23,9 @@ class GameClient {
     val client: HttpClient = HttpClient {
         install(WebSockets)
     }
+
+    var connected = false
+
     var session: WebSocketSession? = null
     var playerId: Int? = null
 
@@ -30,8 +33,9 @@ class GameClient {
     var onConnectionError: ((ConnectException) -> Unit)? = null
     var onDisconnect: (() -> Unit)? = null
     var onGameStart: ((Int) -> Unit)? = null
-    var onOtherPlayerDisconnected: (() -> Unit)? = null
-    var onTurn: ((Int, Int) -> Unit)? = null
+    var onTurnMade: ((Int, Int) -> Unit)? = null
+    var onTie: (() -> Unit)? = null
+    var onVictory: ((Int) -> Unit)? = null
 
     fun start() {
         GlobalScope.launch {
@@ -54,6 +58,7 @@ class GameClient {
         ) {
             session = this
             runLater {
+                connected = true
                 onConnect?.let { it() }
             }
             try {
@@ -64,6 +69,7 @@ class GameClient {
                 }
             } finally {
                 runLater {
+                    connected = false
                     onDisconnect?.let { it() }
                 }
             }
@@ -80,10 +86,8 @@ class GameClient {
         try {
             when {
                 message.startsWith("gameStarted") -> handleGameStart(message)
-                message.startsWith("otherPlayerDisconnected") -> runLater {
-                    onOtherPlayerDisconnected?.let { it() }
-                }
                 message.startsWith("turn") -> handleTurn(message)
+                message.startsWith("gameEnded") -> handleGameEnd(message)
             }
         } catch (e: IllegalArgumentException) {
             println("Error during message handling occured: ${e.message}")
@@ -103,6 +107,21 @@ class GameClient {
         }
     }
 
+    private fun handleGameEnd(message: String) {
+        val tokens = message.split(" ")
+        if (tokens.size < 2 || tokens[1].toIntOrNull() == null) {
+            throw IllegalArgumentException("Expected message to have a winner")
+        }
+        val winner = tokens[1].toIntOrNull() ?: return
+        runLater {
+            if (winner == -1) {
+                onTie?.let { it() }
+            } else {
+                onVictory?.let { it(winner) }
+            }
+        }
+    }
+
     private fun handleTurn(message: String) {
         val tokens = message.split(" ")
         if (tokens.size <= 2) {
@@ -116,7 +135,7 @@ class GameClient {
         }
 
         runLater {
-            onTurn?.let { it(receivedPlayerId, receivedPosition) }
+            onTurnMade?.let { it(receivedPlayerId, receivedPosition) }
         }
     }
 

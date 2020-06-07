@@ -3,6 +3,7 @@ package homeworks.tictactoe.views
 import homeworks.tictactoe.controllers.GameController
 import homeworks.tictactoe.controllers.LobbyController
 import homeworks.tictactoe.models.GameWithFriendModel
+import homeworks.tictactoe.models.LocalGameModel
 import homeworks.tictactoe.stylesheets.MainStylesheet
 import io.ktor.util.KtorExperimentalAPI
 import tornadofx.View
@@ -42,7 +43,7 @@ class MainMenuView : View("Tic Tac Toe") {
 
     private fun startLocalGameWithFriend() {
         val gameScope = Scope()
-        val model = GameWithFriendModel()
+        val model = LocalGameModel()
         val controller = GameController(model)
         setInScope(controller, gameScope)
         replaceWith(find(GameWithFriendView::class, gameScope))

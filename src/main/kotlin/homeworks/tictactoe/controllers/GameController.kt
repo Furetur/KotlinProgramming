@@ -1,12 +1,12 @@
 package homeworks.tictactoe.controllers
 
+import homeworks.tictactoe.models.GameModel
 import javafx.beans.property.SimpleIntegerProperty
-import homeworks.tictactoe.models.GameWithFriendModel
 import tornadofx.Controller
 import tornadofx.booleanBinding
 import tornadofx.stringBinding
 
-class GameController(private val gameModel: GameWithFriendModel) : Controller() {
+class GameController(private val gameModel: GameModel) : Controller() {
     val activePlayerProperty = gameModel.activePlayerProperty
 
     val buttonsData = gameModel.field.map { ButtonData(it) }
@@ -35,7 +35,7 @@ class GameController(private val gameModel: GameWithFriendModel) : Controller() 
     }
 
     fun startGame() {
-        gameModel.startGame()
+        gameModel.onGameStart()
     }
 
     fun onGameEnd(listener: () -> Unit) {
