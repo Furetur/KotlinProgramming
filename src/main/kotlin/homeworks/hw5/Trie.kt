@@ -5,17 +5,22 @@ import java.io.OutputStreamWriter
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.BufferedReader
+import java.io.Serializable
 import java.lang.IllegalArgumentException
 import java.util.Stack
 
-class Trie : CustomSerializable, Iterable<String> {
-    private var root = Node()
-    private var rootSize: Int = 0
+class Trie : Serializable, Iterable<String> {
+    private val root = Node()
+    private var wordsNumberInRoot: Int = 0
+
+    companion object {
+        const val hashCodePrime = 31
+    }
 
     val size: Int
-        get() = rootSize
+        get() = wordsNumberInRoot
 
-    class Node(private var isTerminal: Boolean = false) : Iterable<String> {
+    private class Node(private var isTerminal: Boolean = false) : Iterable<String> {
         private val children = hashMapOf<Char, Node>()
         private var numTerminalChildren: Int = 0
 
@@ -26,25 +31,27 @@ class Trie : CustomSerializable, Iterable<String> {
             return children[symbol]
         }
 
-        private fun traverse(value: String, build: Boolean = false): Pair<List<Node>, Boolean> {
+        data class Path(val nodes: List<Node>, val destinationReached: Boolean)
+
+        private fun traverse(value: String, createNewIfDoesNotExist: Boolean = false): Path {
             val path = mutableListOf<Node>()
             var curNode = this
             path.add(curNode)
 
             for (char in value) {
-                val nextNode = curNode.getChild(char, build) ?: return Pair(path, false)
+                val nextNode = curNode.getChild(char, createNewIfDoesNotExist) ?: return Path(path, false)
                 curNode = nextNode
                 path.add(curNode)
             }
-            return Pair(path, true)
+            return Path(path, true)
         }
 
         fun add(value: String): Boolean {
-            val (path) = traverse(value, true)
-            val isThisValueNew = !path.last().isTerminal
+            val pathNodes = traverse(value, true).nodes
+            val isThisValueNew = !pathNodes.last().isTerminal
             if (isThisValueNew) {
-                path.last().isTerminal = true
-                for (node in path.asReversed().drop(1)) {
+                pathNodes.last().isTerminal = true
+                for (node in pathNodes.asReversed().drop(1)) {
                     node.numTerminalChildren += 1
                 }
             }
@@ -52,16 +59,16 @@ class Trie : CustomSerializable, Iterable<String> {
         }
 
         fun contains(value: String): Boolean {
-            val (path, pathIsComplete) = traverse(value)
-            return pathIsComplete && path.last().isTerminal
+            val path = traverse(value)
+            return path.destinationReached && path.nodes.last().isTerminal
         }
 
         fun remove(value: String): Boolean {
-            val (path, pathIsComplete) = traverse(value)
-            val isValueInTrie = pathIsComplete && path.last().isTerminal
+            val path = traverse(value)
+            val isValueInTrie = path.destinationReached && path.nodes.last().isTerminal
             if (isValueInTrie) {
-                path.last().isTerminal = false
-                for (node in path.asReversed().drop(1)) {
+                path.nodes.last().isTerminal = false
+                for (node in path.nodes.asReversed().drop(1)) {
                     node.numTerminalChildren -= 1
                     if (node.numTerminalChildren == 0) {
                         node.children.clear()
@@ -72,9 +79,9 @@ class Trie : CustomSerializable, Iterable<String> {
         }
 
         fun howManyStartWithPrefix(value: String): Int {
-            val (path, pathIsComplete) = traverse(value)
-            val lastNode = path.last()
-            return if (!pathIsComplete) {
+            val path = traverse(value)
+            val lastNode = path.nodes.last()
+            return if (!path.destinationReached) {
                 0
             } else if (lastNode.isTerminal) {
                 lastNode.numTerminalChildren + 1
@@ -113,17 +120,24 @@ class Trie : CustomSerializable, Iterable<String> {
             }.iterator()
         }
 
-        override fun equals(other: Any?): Boolean {
-            return when (other) {
-                is Iterable<*> -> toSet() == other.toSet()
-                else -> false
+        fun clear() {
+            val stack = Stack<Node>()
+            stack.push(this)
+            while (stack.isNotEmpty()) {
+                val node = stack.pop()
+                stack.addAll(node.children.values)
+                node.children.clear()
             }
+        }
+
+        override fun equals(other: Any?): Boolean {
+            return other is Iterable<*> && other.toSet() == toSet()
         }
 
         override fun hashCode(): Int {
             var result = isTerminal.hashCode()
-            result = 31 * result + children.hashCode()
-            result = 31 * result + numTerminalChildren
+            result = hashCodePrime * result + children.hashCode()
+            result = hashCodePrime * result + numTerminalChildren
             return result
         }
     }
@@ -135,7 +149,7 @@ class Trie : CustomSerializable, Iterable<String> {
 
         val newElementAdded = root.add(value)
         if (newElementAdded) {
-            rootSize += 1
+            wordsNumberInRoot += 1
         }
         return newElementAdded
     }
@@ -147,7 +161,7 @@ class Trie : CustomSerializable, Iterable<String> {
     fun remove(value: String): Boolean {
         val elementGotRemoved = root.remove(value)
         if (elementGotRemoved) {
-            rootSize -= 1
+            wordsNumberInRoot -= 1
         }
         return elementGotRemoved
     }
@@ -156,12 +170,12 @@ class Trie : CustomSerializable, Iterable<String> {
         return root.howManyStartWithPrefix(prefix)
     }
 
-    fun empty() {
-        root = Node()
-        rootSize = 0
+    fun clear() {
+        root.clear()
+        wordsNumberInRoot = 0
     }
 
-    override fun serialize(output: OutputStream) {
+    fun writeObject(output: OutputStream) {
         val writer = OutputStreamWriter(output)
         for (string in this) {
             writer.write("$string\n")
@@ -170,8 +184,8 @@ class Trie : CustomSerializable, Iterable<String> {
         writer.close()
     }
 
-    override fun deserialize(input: InputStream) {
-        empty()
+    fun readObject(input: InputStream) {
+        clear()
         val reader = InputStreamReader(input)
         val bufferedReader = BufferedReader(reader)
         bufferedReader.forEachLine {

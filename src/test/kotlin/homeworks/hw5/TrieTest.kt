@@ -17,7 +17,7 @@ internal class TrieTest {
 
     @BeforeEach
     fun emptyTrie() {
-        trie.empty()
+        trie.clear()
     }
 
     @Test
@@ -141,7 +141,7 @@ internal class TrieTest {
         for (i in 0..1000) {
             trie.add("a$i")
         }
-        trie.empty()
+        trie.clear()
         assertEquals(0, trie.size)
     }
 
@@ -151,7 +151,7 @@ internal class TrieTest {
         for (i in 0..1000) {
             trie.add("a$i")
         }
-        trie.empty()
+        trie.clear()
         assertEquals(setOf<String>(), trie.toSet())
     }
 
@@ -272,7 +272,7 @@ internal class TrieTest {
             trie.add(i.toString())
         }
         val output = ByteArrayOutputStream()
-        trie.serialize(output)
+        trie.writeObject(output)
         assert(output.size() > 0)
     }
 
@@ -282,10 +282,10 @@ internal class TrieTest {
             trie.add(i.toString())
         }
         val output = ByteArrayOutputStream()
-        trie.serialize(output)
+        trie.writeObject(output)
         val input = ByteArrayInputStream(output.toByteArray())
         val newTrie = Trie()
-        newTrie.deserialize(input)
+        newTrie.readObject(input)
         assertEquals(trie.toSet(), newTrie.toSet())
     }
 }
