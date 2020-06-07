@@ -3,7 +3,7 @@ package homeworks.hw6
 import kotlinx.coroutines.runBlocking
 import kotlin.system.measureTimeMillis
 
-fun <T : Comparable<T>> measureQuicksort(list: MutableList<T>): Long {
+fun <E : Comparable<E>> measureQuicksort(list: MutableList<E>): Long {
     return measureTimeMillis {
         quicksort(list)
     }
