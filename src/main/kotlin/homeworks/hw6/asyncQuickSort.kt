@@ -3,23 +3,18 @@ package homeworks.hw6
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
-suspend fun <E : Comparable<E>> asyncQuicksort(list: MutableList<E>) {
+suspend fun <E : Comparable<E>> asyncQuicksort(list: MutableList<E>, left: Int = 0, right: Int = list.size) {
     coroutineScope {
-        if (list.isEmpty()) {
+        if (list.isEmpty() || left >= right) {
             return@coroutineScope
         }
-
-        val newPivotIndex = partition(list)
-        if (newPivotIndex >= 1) {
-            val leftPart: MutableList<E> = list.subList(0, newPivotIndex)
-            launch {
-                asyncQuicksort(leftPart)
-            }
+        val currentSubList = list.subList(left, right)
+        val newPivotIndex = partition(currentSubList)
+        launch {
+            asyncQuicksort(currentSubList, 0, newPivotIndex)
         }
-        if (newPivotIndex < list.lastIndex) {
-            launch {
-                asyncQuicksort(list.subList(newPivotIndex + 1, list.lastIndex + 1))
-            }
+        launch {
+            asyncQuicksort(currentSubList, newPivotIndex + 1)
         }
     }
 }
