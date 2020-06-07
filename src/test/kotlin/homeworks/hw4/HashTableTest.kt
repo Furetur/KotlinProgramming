@@ -4,6 +4,7 @@ import homeworks.hw4.TextCommandRunner.Companion.defaultHashFunction
 import homeworks.hw4.TextCommandRunner.Companion.trivialHashFunction
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -205,5 +206,14 @@ internal class HashTableTest {
     @Test
     fun `in an empty hash table load factor should be 0`() {
         assertEquals(0f, hashTable.loadFactor)
+    }
+
+    @Test
+    fun `hash table expands when too many elements are put`() {
+        val initialBucketsNumber = 5
+        val hashTable = HashTable<String, String>(defaultHashFunction, initialBucketsNumber)
+        repopulateHashTable(hashTable, 1000)
+        val finalBucketsNumber = ((1 / hashTable.loadFactor) * 1000).toInt()
+        assertNotEquals(initialBucketsNumber, finalBucketsNumber)
     }
 }

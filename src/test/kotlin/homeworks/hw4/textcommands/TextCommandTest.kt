@@ -2,6 +2,7 @@ package homeworks.hw4.textcommands
 
 import homeworks.hw4.HashTable
 import homeworks.hw4.TextCommandRunner.Companion.defaultHashFunction
+import homeworks.hw4.repopulateHashTable
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -18,10 +19,7 @@ internal abstract class TextCommandTest(private val commandName: String, private
     @BeforeEach
     fun resetHashTables() {
         emptyHashTable.clear()
-        populatedHashTable.clear()
-        for (i in 1..100) {
-            populatedHashTable.put("key$i", "val$i")
-        }
+        repopulateHashTable(populatedHashTable, 100)
     }
 
     private fun getStringCommandWithCorrectName(argumentsNumber: Int): String {
