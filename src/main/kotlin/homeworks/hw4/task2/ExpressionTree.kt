@@ -5,7 +5,7 @@ import java.lang.IllegalArgumentException
 class ExpressionTree(private val root: Node) {
 
     companion object {
-        val supportedOperators = listOf('+', '/', '-', '*')
+        const val defaultHashCodePrime = 31
     }
 
     class UnsupportedOperatorException(message: String) : IllegalArgumentException(message)
@@ -35,17 +35,17 @@ class ExpressionTree(private val root: Node) {
         }
 
         override fun equals(other: Any?): Boolean {
-            return when (other) {
-                is OperatorNode -> operator == other.operator &&
-                        operand1 == other.operand1 && operand2 == other.operand2
-                else -> false
+            return if (other !is OperatorNode) {
+                 false
+            } else {
+                operator == other.operator && operand1 == other.operand1 && operand2 == other.operand2
             }
         }
 
         override fun hashCode(): Int {
             var result = operator.hashCode()
-            result = 31 * result + operand1.hashCode()
-            result = 31 * result + operand2.hashCode()
+            result = defaultHashCodePrime * result + operand1.hashCode()
+            result = defaultHashCodePrime * result + operand2.hashCode()
             return result
         }
     }
@@ -60,9 +60,10 @@ class ExpressionTree(private val root: Node) {
         }
 
         override fun equals(other: Any?): Boolean {
-            return when (other) {
-                is ValueNode -> value == other.value
-                else -> false
+            return if (other !is ValueNode) {
+                false
+            } else {
+                value == other.value
             }
         }
 
@@ -75,14 +76,13 @@ class ExpressionTree(private val root: Node) {
         return root.evaluate()
     }
 
-    override fun toString(): String {
-        return root.toString()
-    }
+    override fun toString(): String = root.toString()
 
     override fun equals(other: Any?): Boolean {
-        return when (other) {
-            is ExpressionTree -> root == other.root
-            else -> false
+        return if (other !is ExpressionTree) {
+            false
+        } else {
+            root == other.root
         }
     }
 
