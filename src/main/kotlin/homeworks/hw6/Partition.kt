@@ -11,14 +11,12 @@ fun <E : Comparable<E>> partition(list: MutableList<E>): Int {
     for ((index, element) in list.withIndex()) {
         if (element < pivot) {
             // swap list[firstElementGreaterThanPivot] and list[index]
-            list[index] = list[firstElementGreaterThanPivot]
-            list[firstElementGreaterThanPivot] = element
+            list[firstElementGreaterThanPivot] = list[index].also { list[index] = list[firstElementGreaterThanPivot] }
             firstElementGreaterThanPivot += 1
         }
     }
     // swap list[firstElementGreaterThanPivot] and list[list.lastIndex]
-    val temp = list[firstElementGreaterThanPivot]
-    list[firstElementGreaterThanPivot] = list.last()
-    list[list.lastIndex] = temp
+    list[firstElementGreaterThanPivot] =
+        list[list.lastIndex].also { list[list.lastIndex] = list[firstElementGreaterThanPivot] }
     return firstElementGreaterThanPivot
 }
