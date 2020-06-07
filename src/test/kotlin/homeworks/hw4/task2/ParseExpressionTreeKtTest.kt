@@ -154,14 +154,14 @@ internal class ParseExpressionTreeKtTest {
     @Test
     fun `should throw if operator node has unsupported operation 1`() {
         assertThrows(ExpressionTree.UnsupportedOperatorException::class.java) {
-            parseExpressionTree("(. 1 2)")
+            parseExpressionTree("(. 1 2)").evaluate()
         }
     }
 
     @Test
     fun `should throw if operator node has unsupported operation 2`() {
         assertThrows(ExpressionTree.UnsupportedOperatorException::class.java) {
-            parseExpressionTree("(| 1 2)")
+            parseExpressionTree("(| 1 2)").evaluate()
         }
     }
 

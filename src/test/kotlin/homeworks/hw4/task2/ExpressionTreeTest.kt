@@ -100,7 +100,7 @@ internal class ExpressionTreeTest {
         assertThrows(ExpressionTree.UnsupportedOperatorException::class.java) {
             ExpressionTree.OperatorNode(
                 '&', ExpressionTree.ValueNode(1), ExpressionTree.ValueNode(2)
-            )
+            ).evaluate()
         }
     }
 

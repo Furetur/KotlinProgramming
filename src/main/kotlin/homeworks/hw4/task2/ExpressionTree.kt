@@ -16,11 +16,6 @@ class ExpressionTree(private val root: Node) {
     }
 
     class OperatorNode(val operator: Char, val operand1: Node, val operand2: Node) : Node {
-        init {
-            if (!supportedOperators.contains(operator)) {
-                throw UnsupportedOperatorException("Operator $operator is not supported")
-            }
-        }
 
         override fun evaluate(): Double {
             val leftResult = operand1.evaluate()
