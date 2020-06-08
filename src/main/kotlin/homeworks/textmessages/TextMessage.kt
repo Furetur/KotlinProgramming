@@ -12,37 +12,37 @@ open class TextMessage(
 
     init {
         if (tokens[0] != name) {
-            throw IllegalCommandTypeException()
+            throw IllegalMessageTypeException()
         }
         if (arguments.size != requiredArgumentsNumber) {
-            throw IllegalNumberOfCommandArgumentsException()
+            throw IllegalNumberOfMessageArgumentsException()
         }
     }
 
     fun mustBePlayerId(integer: Int): Int {
         if (!(0..1).contains(integer)) {
-            throw IllegalCommandArgumentSyntax("Must be a playerId, but was $integer")
+            throw IllegalMessageArgumentSyntax("Must be a playerId, but was $integer")
         }
         return integer
     }
 
     fun mustBePlayerIdOrNegativeOne(integer: Int): Int {
         if (!(-1..1).contains(integer)) {
-            throw IllegalCommandArgumentSyntax("Must be a playerId, but was $integer")
+            throw IllegalMessageArgumentSyntax("Must be a playerId, but was $integer")
         }
         return integer
     }
 
     fun mustBePosition(integer: Int): Int {
         if (!(0 until FIELD_SIZE).contains(integer)) {
-            throw IllegalCommandArgumentSyntax("Must be a field position, but was $integer")
+            throw IllegalMessageArgumentSyntax("Must be a field position, but was $integer")
         }
         return integer
     }
 
-    class IllegalCommandTypeException : IllegalArgumentException()
+    class IllegalMessageTypeException : IllegalArgumentException()
 
-    class IllegalNumberOfCommandArgumentsException : IllegalArgumentException()
+    class IllegalNumberOfMessageArgumentsException : IllegalArgumentException()
 
-    class IllegalCommandArgumentSyntax(msg: String) : java.lang.IllegalArgumentException(msg)
+    class IllegalMessageArgumentSyntax(msg: String) : java.lang.IllegalArgumentException(msg)
 }

@@ -2,10 +2,7 @@ package homeworks.tictactoe
 
 import homeworks.server.GameServer.Companion.HOST
 import homeworks.server.GameServer.Companion.PORT
-import homeworks.textmessages.GameEndedMessage
-import homeworks.textmessages.GameStartedMessage
-import homeworks.textmessages.TurnClientMessage
-import homeworks.textmessages.TurnServerMessage
+import homeworks.textmessages.*
 import io.ktor.client.HttpClient
 import io.ktor.client.features.websocket.WebSockets
 import io.ktor.client.features.websocket.ws
@@ -93,8 +90,12 @@ class GameClient {
                 message.startsWith(TurnServerMessage.name) -> handleTurn(message)
                 message.startsWith(GameEndedMessage.name) -> handleGameEnd(message)
             }
-        } catch (e: IllegalArgumentException) {
-            println("Error during message handling occured: ${e.message}")
+        } catch (e: TextMessage.IllegalMessageTypeException) {
+            println("Received an unsupported message")
+        } catch (e: TextMessage.IllegalNumberOfMessageArgumentsException) {
+            println("Received message with an illegal number of arguments")
+        } catch (e: TextMessage.IllegalMessageArgumentSyntax) {
+            println("Received message with illegal argument syntax: ${e.message}")
         }
     }
 
@@ -125,8 +126,7 @@ class GameClient {
     }
 
     fun makeTurn(position: Int) = GlobalScope.launch {
-        session?.let {
-            it.send(Frame.Text(TurnClientMessage.compose(position)))
-        } ?: throw IllegalStateException("The client have not yet connected to the server")
+        assert(session != null)
+        session?.send(Frame.Text(TurnClientMessage.compose(position)))
     }
 }

@@ -1,5 +1,7 @@
 package homeworks.server
 
+import homeworks.logic.GameLoop
+import homeworks.textmessages.TextMessage
 import homeworks.textmessages.TurnClientMessage
 import homeworks.utils.getMessageIntArguments
 import io.ktor.application.install
@@ -86,10 +88,18 @@ class GameServer {
             if (message.startsWith(TurnClientMessage.name)) {
                 handleTurnMessage(session, message)
             }
-        } catch (e: IllegalArgumentException) {
-            println("IllegalArgumentException thrown during message handling $e")
-        } catch (e: IllegalStateException) {
-            println("IllegalStateException thrown during message handling $e")
+        } catch (e: TextMessage.IllegalMessageTypeException) {
+            println("Received unsupported message")
+        } catch (e: TextMessage.IllegalNumberOfMessageArgumentsException) {
+            println("Received message with an illegal number of arguments")
+        } catch (e: TextMessage.IllegalMessageArgumentSyntax) {
+            println("Received message with illegal arguments: ${e.message}")
+        } catch (e: PlayerNotInLobbyException) {
+            println("Received turn message from player who is not in lobby")
+        } catch (e: GameLoop.PlayerCannotMakeTurn) {
+            println("Received turn message from the player who cannot make a turn")
+        } catch (e: GameLoop.IllegalTurnPosition) {
+            println("Received turn message to an illegal position")
         }
     }
 
