@@ -2,8 +2,8 @@ package homeworks.tictactoewithserver.tictactoe.bots
 
 import TicTacToeApp.Companion.FIELD_LINEAR_SIZE
 import TicTacToeApp.Companion.FIELD_SIZE
+import homeworks.tictactoewithserver.logic.FieldManager
 import javafx.beans.property.SimpleIntegerProperty
-import homeworks.tictactoewithserver.logic.getAlmostCapturedLineBy
 
 class HardBot(private val gameField: List<SimpleIntegerProperty>, playerId: Int, botId: Int) :
     EasyBot(gameField, playerId, botId) {
@@ -26,15 +26,15 @@ class HardBot(private val gameField: List<SimpleIntegerProperty>, playerId: Int,
     }
 
     private fun findVictoriousCellForBot(): SimpleIntegerProperty? {
-        val almostCapturedLineByBot = getAlmostCapturedLineBy(rawField, FIELD_LINEAR_SIZE, botId)
-        val cellIndex = almostCapturedLineByBot?.find { it.value == -1 }?.index
-        return getCellForBotByIndex(cellIndex)
+        val fieldManager = FieldManager(rawField, FIELD_LINEAR_SIZE)
+        val almostCapturedLineByBot = fieldManager.getAlmostCapturedLineBy(botId)
+        return getCellForBotByIndex(almostCapturedLineByBot?.firstFreeCell?.index)
     }
 
     private fun findVictoriousCellForPlayer(): SimpleIntegerProperty? {
-        val almostCapturedLineByPlayer = getAlmostCapturedLineBy(rawField, FIELD_LINEAR_SIZE, playerId)
-        val cellIndex = almostCapturedLineByPlayer?.find { it.value == -1 }?.index
-        return getCellForBotByIndex(cellIndex)
+        val fieldManager = FieldManager(rawField, FIELD_LINEAR_SIZE)
+        val almostCapturedLineByPlayer = fieldManager.getAlmostCapturedLineBy(playerId)
+        return getCellForBotByIndex(almostCapturedLineByPlayer?.firstFreeCell?.index)
     }
 
     private fun pickMiddle(): SimpleIntegerProperty? {

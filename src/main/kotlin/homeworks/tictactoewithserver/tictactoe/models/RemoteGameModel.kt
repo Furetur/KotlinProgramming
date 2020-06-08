@@ -64,7 +64,9 @@ class RemoteGameModel : GameLoop, GameModel {
             onError(ConnectionLostException())
         }
         client.onDisconnect = {
-            onError(ConnectionLostException())
+            if (!gameOver) {
+                onError(ConnectionLostException())
+            }
         }
     }
 
@@ -107,8 +109,8 @@ class RemoteGameModel : GameLoop, GameModel {
     }
 
     override fun onTie() {
-        gameOver = true
         winner = -1
+        gameOver = true
     }
 
     override fun onError(exception: Exception) {

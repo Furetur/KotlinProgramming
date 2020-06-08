@@ -26,7 +26,8 @@ open class LocalGameLoop : GameLoop {
     }
 
     private fun checkIfGameEnded() {
-        val victoriousPlayer = getWinner(field, FIELD_LINEAR_SIZE)
+        val fieldManager = FieldManager(field, FIELD_LINEAR_SIZE)
+        val victoriousPlayer = fieldManager.getWinner()
         if (victoriousPlayer != null) {
             onVictory(victoriousPlayer)
         } else {
