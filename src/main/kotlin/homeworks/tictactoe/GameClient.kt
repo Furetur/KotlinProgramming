@@ -2,6 +2,10 @@ package homeworks.tictactoe
 
 import homeworks.server.GameServer.Companion.HOST
 import homeworks.server.GameServer.Companion.PORT
+import homeworks.textmessages.GameEndedMessage
+import homeworks.textmessages.GameStartedMessage
+import homeworks.textmessages.TurnClientMessage
+import homeworks.textmessages.TurnServerMessage
 import io.ktor.client.HttpClient
 import io.ktor.client.features.websocket.WebSockets
 import io.ktor.client.features.websocket.ws
@@ -85,9 +89,9 @@ class GameClient {
     private fun handleMessage(message: String) {
         try {
             when {
-                message.startsWith("gameStarted") -> handleGameStart(message)
-                message.startsWith("turn") -> handleTurn(message)
-                message.startsWith("gameEnded") -> handleGameEnd(message)
+                message.startsWith(GameStartedMessage.name) -> handleGameStart(message)
+                message.startsWith(TurnServerMessage.name) -> handleTurn(message)
+                message.startsWith(GameEndedMessage.name) -> handleGameEnd(message)
             }
         } catch (e: IllegalArgumentException) {
             println("Error during message handling occured: ${e.message}")
@@ -95,56 +99,34 @@ class GameClient {
     }
 
     private fun handleGameStart(message: String) {
-        val tokens = message.split(" ")
-        if (tokens.size < 2) {
-            throw IllegalArgumentException("Expected player id in gameStart message")
-        }
-        val receivedPlayerId = tokens[1].toIntOrNull()
-            ?: throw IllegalArgumentException("Expected player id of type Int in gameStart message")
-        playerId = receivedPlayerId
+        val gameStartedMessage = GameStartedMessage(message)
         runLater {
-            onGameStart?.let { it(receivedPlayerId) }
+            onGameStart?.let { it(gameStartedMessage.playerId) }
         }
     }
 
     private fun handleGameEnd(message: String) {
-        val tokens = message.split(" ")
-        if (tokens.size < 2 || tokens[1].toIntOrNull() == null) {
-            throw IllegalArgumentException("Expected message to have a winner")
-        }
-        val winner = tokens[1].toIntOrNull() ?: return
+        val gameEndedMessage = GameEndedMessage(message)
         runLater {
-            if (winner == -1) {
+            if (gameEndedMessage.winner == -1) {
                 onTie?.let { it() }
             } else {
-                onVictory?.let { it(winner) }
+                onVictory?.let { it(gameEndedMessage.winner) }
             }
         }
     }
 
     private fun handleTurn(message: String) {
-        val tokens = message.split(" ")
-        if (tokens.size <= 2) {
-            throw IllegalArgumentException("Expected message 'turn <player> <position>' but received $message")
-        }
-        val receivedPlayerId = tokens[1].toIntOrNull()
-        val receivedPosition = tokens[2].toIntOrNull()
-
-        if (receivedPlayerId == null || receivedPosition == null) {
-            throw IllegalArgumentException("One of the arguments of turn message was not int")
-        }
+        val turnMessage = TurnServerMessage(message)
 
         runLater {
-            onTurnMade?.let { it(receivedPlayerId, receivedPosition) }
+            onTurnMade?.let { it(turnMessage.playerId, turnMessage.position) }
         }
     }
 
     fun makeTurn(position: Int) = GlobalScope.launch {
         session?.let {
-            if (playerId == null) {
-                throw IllegalStateException("This player has not yet joined a game")
-            }
-            it.send(Frame.Text("turn $position"))
+            it.send(Frame.Text(TurnClientMessage.compose(position)))
         } ?: throw IllegalStateException("The client have not yet connected to the server")
     }
 }

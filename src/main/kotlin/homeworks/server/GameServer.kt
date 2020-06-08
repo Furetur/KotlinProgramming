@@ -1,5 +1,6 @@
 package homeworks.server
 
+import homeworks.textmessages.TurnClientMessage
 import homeworks.utils.getMessageIntArguments
 import io.ktor.application.install
 import io.ktor.http.cio.websocket.Frame
@@ -82,7 +83,7 @@ class GameServer {
     private fun handleMessage(session: WebSocketServerSession, message: String) {
         println("Message received: $message")
         try {
-            if (message.startsWith("turn")) {
+            if (message.startsWith(TurnClientMessage.name)) {
                 handleTurnMessage(session, message)
             }
         } catch (e: IllegalArgumentException) {
@@ -93,12 +94,12 @@ class GameServer {
     }
 
     private fun handleTurnMessage(session: WebSocketServerSession, message: String) {
-        val position = getMessageIntArguments(message, 1)[0]
+        val turnMessage = TurnClientMessage(message)
         if (!playersManager.isPlayerConnected(session)) {
             throw PlayerNotInLobbyException()
         }
         val playerId = playersManager.getPlayerId(session)
-        game.makeTurn(playerId, position)
+        game.makeTurn(playerId, turnMessage.position)
     }
 
     inner class PlayersManager {

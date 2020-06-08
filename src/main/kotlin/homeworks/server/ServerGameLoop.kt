@@ -1,6 +1,9 @@
 package homeworks.server
 
 import homeworks.logic.LocalGameLoop
+import homeworks.textmessages.GameEndedMessage
+import homeworks.textmessages.GameStartedMessage
+import homeworks.textmessages.TurnServerMessage
 
 class ServerGameLoop(private val playersManager: GameServer.PlayersManager) : LocalGameLoop() {
     var gameOn = false
@@ -9,7 +12,7 @@ class ServerGameLoop(private val playersManager: GameServer.PlayersManager) : Lo
         println("Game started")
         super.onGameStart()
         gameOn = true
-        playersManager.notifyEach { "gameStarted $it" }
+        playersManager.notifyEach { GameStartedMessage.compose(it) }
     }
 
     override fun onTurnStart(playerId: Int) {
@@ -20,7 +23,7 @@ class ServerGameLoop(private val playersManager: GameServer.PlayersManager) : Lo
     override fun onTurnMade(playerId: Int, position: Int) {
         println("Turn made by #$playerId to position $position")
         super.onTurnMade(playerId, position)
-        playersManager.notifyAll("turn $playerId $position")
+        playersManager.notifyAll(TurnServerMessage.compose(playerId, position))
     }
 
     fun onPlayerDisconnected(playerId: Int) {
@@ -32,7 +35,7 @@ class ServerGameLoop(private val playersManager: GameServer.PlayersManager) : Lo
         println("Player #$playerId won")
         super.onVictory(playerId)
         gameOn = false
-        playersManager.notifyAll("gameEnded $playerId")
+        playersManager.notifyAll(GameEndedMessage.compose(playerId))
         playersManager.kickAll()
     }
 
@@ -40,7 +43,7 @@ class ServerGameLoop(private val playersManager: GameServer.PlayersManager) : Lo
         println("Tie!")
         super.onTie()
         gameOn = false
-        playersManager.notifyAll("gameEnded -1")
+        playersManager.notifyAll(GameEndedMessage.compose(-1))
         playersManager.kickAll()
     }
 }

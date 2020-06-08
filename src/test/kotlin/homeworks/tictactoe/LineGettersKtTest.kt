@@ -1,53 +1,54 @@
 package homeworks.tictactoe
 
+import homeworks.logic.getFirstCapturedLine
 import javafx.beans.property.SimpleIntegerProperty
 import org.junit.jupiter.api.Assertions.assertEquals
 
 internal class LineGettersKtTest {
-    private fun getFieldWithCapturedRow(linearSize: Int, rowNum: Int): List<SimpleIntegerProperty> {
-        val field = List(linearSize * linearSize) { SimpleIntegerProperty(-1) }
-        field.slice(linearSize * rowNum until linearSize * (rowNum - 1)).forEach {
-            it.set(0)
+    private fun getIndexedFieldWithCapturedRow(linearSize: Int, rowNum: Int): MutableList<IndexedValue<Int>> {
+        val field = MutableList(linearSize * linearSize) { -1 }
+        for (i in linearSize * rowNum until linearSize * (rowNum - 1)) {
+            field[i] = 0
+        }
+        return field.withIndex().toMutableList()
+    }
+
+    private fun getFieldWithCapturedColumn(linearSize: Int, columnNum: Int): MutableList<Int> {
+        val size = linearSize * linearSize
+        val field = MutableList(size) { -1 }
+        for (i in columnNum until size step linearSize) {
+            field[i] = 0
         }
         return field
     }
 
-    private fun getFieldWithCapturedColumn(linearSize: Int, columnNum: Int): List<SimpleIntegerProperty> {
+    private fun getFieldWithCapturedMainDiagonal(linearSize: Int): MutableList<Int> {
         val size = linearSize * linearSize
-        val field = List(size) { SimpleIntegerProperty(-1) }
-        field.slice(columnNum until size step linearSize).forEach {
-            it.set(0)
-        }
-        return field
-    }
-
-    private fun getFieldWithCapturedMainDiagonal(linearSize: Int): List<SimpleIntegerProperty> {
-        val size = linearSize * linearSize
-        val field = List(size) { SimpleIntegerProperty(-1) }
+        val field = MutableList(size) { -1 }
         for (i in 0 until size) {
-            field[i + linearSize * i].set(0)
+            field[i + linearSize * i] = 0
         }
         return field
     }
 
-    private fun getFieldWithCapturedSecondaryDiagonal(linearSize: Int): List<SimpleIntegerProperty> {
+    private fun getFieldWithCapturedSecondaryDiagonal(linearSize: Int): MutableList<Int> {
         val size = linearSize * linearSize
-        val field = List(size) { SimpleIntegerProperty(-1) }
+        val field = MutableList(size) { -1 }
         for (i in 0 until size) {
-            field[(linearSize - 1 - i) + linearSize * i].set(0)
+            field[(linearSize - 1 - i) + linearSize * i] = 0
         }
         return field
     }
 
     fun `should return captured first row of 3 by 3 field`() {
-        val field = getFieldWithCapturedRow(3, 0)
+        val field = getIndexedFieldWithCapturedRow(3, 0)
         val expected = field.slice(0..2)
         val actual = getFirstCapturedLine(field, 3)
         assertEquals(expected, actual)
     }
 
     fun `should return captured third row of 5 by 5 field`() {
-        val field = getFieldWithCapturedRow(5, 2)
+        val field = getIndexedFieldWithCapturedRow(5, 2)
         val expected = field.slice(5..9)
         val actual = getFirstCapturedLine(field, 5)
         assertEquals(expected, actual)

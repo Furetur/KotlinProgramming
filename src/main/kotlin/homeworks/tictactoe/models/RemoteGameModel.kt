@@ -8,7 +8,6 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
 import java.lang.Exception
-import java.lang.IllegalArgumentException
 import tornadofx.getValue
 import tornadofx.setValue
 import java.net.ConnectException
@@ -16,6 +15,8 @@ import java.net.ConnectException
 @KtorExperimentalAPI
 class RemoteGameModel : GameLoop, GameModel {
     private val client = GameClient()
+
+    private var thisPlayerId: Int = -1
 
     override val field = List(FIELD_SIZE) { SimpleIntegerProperty(-1) }
 
@@ -45,10 +46,11 @@ class RemoteGameModel : GameLoop, GameModel {
             connected = true
         }
         client.onGameStart = {
+            thisPlayerId = it
             onGameStart()
         }
         client.onTurnMade = { playerId, position ->
-            if (playerId != client.playerId) {
+            if (playerId != thisPlayerId) {
                 onTurnMade(playerId, position)
             }
         }
@@ -87,7 +89,7 @@ class RemoteGameModel : GameLoop, GameModel {
 
     override fun onTurnStart(playerId: Int) {
         activePlayer = playerId
-        waiting = activePlayer != client.playerId
+        waiting = activePlayer != thisPlayerId
     }
 
     override fun onTurnMade(playerId: Int, position: Int) {

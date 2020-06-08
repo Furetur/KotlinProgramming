@@ -27,7 +27,7 @@ private fun getAlmostCapturedLines(field: List<Int>, size: Int): List<List<Index
     return findLines(field, size) { line -> isLineAlmostCaptured(line.map { it.value }) }
 }
 
-fun getFirstCapturedLine(field: List<Int>, size: Int): List<IndexedValue<Int>>? {
+private fun getFirstCapturedLine(field: List<Int>, size: Int): List<IndexedValue<Int>>? {
     return findLines(field, size) { line -> isLineCaptured(line.map { it.value }) }.firstOrNull()
 }
 
