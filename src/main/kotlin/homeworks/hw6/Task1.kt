@@ -1,29 +1,33 @@
 package homeworks.hw6
 
+import homeworks.hw6.benchmarks.BenchmarkRunner
+import homeworks.hw6.benchmarks.ReversedListBenchmark
+import homeworks.hw6.benchmarks.ShuffledListBenchmark
+import homeworks.hw6.benchmarks.StringBenchmark
+
 const val COLUMN_WIDTH = 50
 const val COLUMNS_NUMBER = 3
 const val SMALL_TEST_SIZE = 1000
 const val BIG_TEST_SIZE = 10000
 
-fun getColumn(str: String): String {
-    return str.toUpperCase() + " ".repeat(COLUMN_WIDTH - str.length)
-}
+val benchmarks = listOf(ReversedListBenchmark(), ShuffledListBenchmark(), StringBenchmark())
 
-fun printTestResults(testName: String, results: Pair<Long, Long>) {
-    val (time1, time2) = results
-    val firstColumn = getColumn(testName)
-    val secondColumn = getColumn(time1.toString())
-    val thirdColumn = getColumn(time2.toString())
-    println("$firstColumn|$secondColumn|$thirdColumn")
-}
+val benchmarkRunner = BenchmarkRunner(SMALL_TEST_SIZE, BIG_TEST_SIZE, benchmarks)
+
+val tableRenderer = PrettyTableRenderer(COLUMNS_NUMBER, COLUMN_WIDTH)
 
 fun main() {
-    println("${getColumn("test")}|${getColumn("quicksort (ms)")}|${getColumn("async quicksort (ms)")}")
-    println("-".repeat(COLUMN_WIDTH * COLUMNS_NUMBER))
-    printTestResults("reversed list, size=1000", measureOnReversedList(SMALL_TEST_SIZE))
-    printTestResults("reversed list, size=10000", measureOnReversedList(BIG_TEST_SIZE))
-    printTestResults("shuffled list, size=1000", measureOnShuffledList(SMALL_TEST_SIZE))
-    printTestResults("shuffled list, size=10000", measureOnShuffledList(BIG_TEST_SIZE))
-    printTestResults("string list, size=1000", measureOnStringList(SMALL_TEST_SIZE))
-    printTestResults("string list, size=10000", measureOnStringList(BIG_TEST_SIZE))
+    val results = benchmarkRunner.runBenchmarks()
+
+    tableRenderer.addRow("Test", "QuickSort (ms)", "Async QuickSort (ms)")
+
+    for (result in results) {
+        tableRenderer.addRow(
+            "${result.benchmarkName}, SIZE=${result.size}",
+            result.quickSortTime.toString(),
+            result.asyncQuickSortTime.toString()
+        )
+    }
+
+    println(tableRenderer.renderTable())
 }
