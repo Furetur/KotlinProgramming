@@ -45,5 +45,6 @@ class GameWithFriendView : View("Game") {
         alert(Alert.AlertType.INFORMATION, text, "Return to the main menu", ButtonType.OK, actionFn = {
             replaceWith<MainMenuView>()
         })
+        replaceWith<MainMenuView>()
     }
 }
