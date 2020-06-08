@@ -138,7 +138,7 @@ class GameServer {
         fun forgetPlayer(session: WebSocketServerSession): Int {
             val playerId = players.indexOf(session)
             if (playerId == -1) {
-                throw IllegalArgumentException("Player not in game")
+                throw PlayerNotInLobbyException()
             }
             players[playerId] = null
             return playerId
@@ -156,7 +156,7 @@ class GameServer {
             }
         }
 
-        suspend fun kick(playerId: Int) {
+        private suspend fun kick(playerId: Int) {
             val session = players[playerId] ?: throw PlayerNotInLobbyException()
             println("Kicking player #$playerId")
             forgetPlayer(session)

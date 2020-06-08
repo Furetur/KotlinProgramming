@@ -24,7 +24,7 @@ import java.net.ConnectException
 
 @KtorExperimentalAPI
 class GameClient {
-    val client: HttpClient = HttpClient {
+    private val client: HttpClient = HttpClient {
         install(WebSockets)
     }
 

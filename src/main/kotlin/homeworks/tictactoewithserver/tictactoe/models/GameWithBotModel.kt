@@ -4,7 +4,6 @@ import homeworks.tictactoewithserver.tictactoe.bots.Bot
 import homeworks.tictactoewithserver.tictactoe.bots.EasyBot
 import homeworks.tictactoewithserver.tictactoe.bots.HardBot
 import javafx.beans.property.SimpleIntegerProperty
-import java.lang.IllegalArgumentException
 
 class GameWithBotModel(playerId: Int, private val botId: Int, botType: String) : LocalGameModel() {
     private val bot: Bot = when (botType) {
@@ -25,9 +24,7 @@ class GameWithBotModel(playerId: Int, private val botId: Int, botType: String) :
 
     private fun makeTurn(playerId: Int, cell: SimpleIntegerProperty) {
         val position = field.indexOf(cell)
-        if (position == -1) {
-            throw IllegalArgumentException("This cell does not exist")
-        }
+        assert(position != -1)
         makeTurn(playerId, position)
     }
 }

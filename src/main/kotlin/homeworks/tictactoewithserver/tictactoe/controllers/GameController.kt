@@ -15,7 +15,6 @@ class GameController(private val gameModel: GameModel) : Controller() {
         val text = stringBinding(playerId) {
             getPlayerFigure(value)
         }
-        val isFree = booleanBinding(playerId) { value == -1 }
         val isDisabled = booleanBinding(playerId, gameModel.waitingProperty) {
             playerId.value != -1 || gameModel.waitingProperty.value == true
         }
