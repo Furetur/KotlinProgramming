@@ -3,7 +3,6 @@ package homeworks.tictactoe.stylesheets
 import TicTacToeApp.Companion.APP_WIDTH
 import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
-import tornadofx.Stylesheet.Companion.box
 import tornadofx.Stylesheet
 import tornadofx.cssclass
 import tornadofx.em

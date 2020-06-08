@@ -2,7 +2,6 @@ package homeworks.logic
 
 import java.lang.Exception
 import java.lang.IllegalArgumentException
-import java.lang.IllegalStateException
 
 interface GameLoop {
     fun onGameStart()

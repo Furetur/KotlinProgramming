@@ -2,7 +2,10 @@ package homeworks.tictactoe.controllers
 
 import homeworks.tictactoe.models.RemoteGameModel
 import io.ktor.util.KtorExperimentalAPI
-import tornadofx.*
+import tornadofx.Controller
+import tornadofx.stringBinding
+import tornadofx.getValue
+import tornadofx.setValue
 
 @KtorExperimentalAPI
 class LobbyController : Controller() {

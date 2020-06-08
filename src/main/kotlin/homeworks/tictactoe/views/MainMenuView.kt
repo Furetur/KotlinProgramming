@@ -2,7 +2,6 @@ package homeworks.tictactoe.views
 
 import homeworks.tictactoe.controllers.GameController
 import homeworks.tictactoe.controllers.LobbyController
-import homeworks.tictactoe.models.GameWithFriendModel
 import homeworks.tictactoe.models.LocalGameModel
 import homeworks.tictactoe.stylesheets.MainStylesheet
 import io.ktor.util.KtorExperimentalAPI

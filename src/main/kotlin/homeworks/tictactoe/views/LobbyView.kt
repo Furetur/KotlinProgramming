@@ -3,9 +3,14 @@ package homeworks.tictactoe.views
 import homeworks.tictactoe.controllers.GameController
 import homeworks.tictactoe.controllers.LobbyController
 import io.ktor.util.KtorExperimentalAPI
-import javafx.scene.control.Alert
-import javafx.scene.control.ButtonType
-import tornadofx.*
+import tornadofx.View
+import tornadofx.button
+import tornadofx.label
+import tornadofx.vbox
+import tornadofx.onChange
+import tornadofx.action
+import tornadofx.Scope
+import tornadofx.find
 
 @KtorExperimentalAPI
 class LobbyView : View("Lobby") {

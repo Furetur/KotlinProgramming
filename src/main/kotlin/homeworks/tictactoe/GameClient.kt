@@ -2,7 +2,11 @@ package homeworks.tictactoe
 
 import homeworks.server.GameServer.Companion.HOST
 import homeworks.server.GameServer.Companion.PORT
-import homeworks.textmessages.*
+import homeworks.textmessages.GameStartedMessage
+import homeworks.textmessages.GameEndedMessage
+import homeworks.textmessages.TurnServerMessage
+import homeworks.textmessages.TurnClientMessage
+import homeworks.textmessages.TextMessage
 import io.ktor.client.HttpClient
 import io.ktor.client.features.websocket.WebSockets
 import io.ktor.client.features.websocket.ws
@@ -16,7 +20,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import tornadofx.runLater
-import java.lang.IllegalArgumentException
 import java.net.ConnectException
 
 @KtorExperimentalAPI
