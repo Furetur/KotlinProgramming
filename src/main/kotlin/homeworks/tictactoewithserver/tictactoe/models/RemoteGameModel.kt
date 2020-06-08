@@ -63,6 +63,9 @@ class RemoteGameModel : GameLoop, GameModel {
         client.onConnectionError = {
             onError(ConnectionLostException())
         }
+        client.onDisconnect = {
+            onError(ConnectionLostException())
+        }
     }
 
     class ConnectionLostException : ConnectException()

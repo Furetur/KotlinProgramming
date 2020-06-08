@@ -52,7 +52,7 @@ open class LocalGameLoop : GameLoop {
     }
 
     override fun onError(exception: Exception) {
-        TODO("Not yet implemented")
+        println("Error occurred in the LocalGameLoop $exception")
     }
 
     override fun makeTurn(playerId: Int, position: Int) {
