@@ -1,0 +1,7 @@
+TEST                                              |QUICKSORT (MS)                                    |ASYNC QUICKSORT (MS)
+REVERSED LIST, SIZE=1000                          |33                                                |125
+SHUFFLED LIST, SIZE=1000                          |0                                                 |15
+PERMUTATION BENCHMARK, SIZE=1000                  |3                                                 |17
+REVERSED LIST, SIZE=10000                         |514                                               |549
+SHUFFLED LIST, SIZE=10000                         |2                                                 |29
+PERMUTATION BENCHMARK, SIZE=10000                 |8                                                 |45
