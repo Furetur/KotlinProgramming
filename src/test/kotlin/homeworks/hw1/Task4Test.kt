@@ -4,7 +4,7 @@ import homeworks.hw1.isPalindrome
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 
-internal class TaskTest {
+internal class Task4Test {
 
     @Test
     fun `should consider empty strings palindromes`() {
