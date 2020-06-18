@@ -6,7 +6,7 @@ import org.junit.jupiter.api.fail
 import java.io.File
 import java.io.FileNotFoundException
 
-internal class TaskTest {
+internal class Task5Test {
     @Test
     fun `should work for empty files`() {
         val emptyFile = File("./src/test/kotlin/homeworks/hw1/emptytest.txt")
