@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.lang.IllegalArgumentException
 
-internal class TaskTest {
+internal class Task3Test {
     @Test
     fun `should throw exception if childString is empty`() {
         assertThrows(IllegalArgumentException::class.java) {
