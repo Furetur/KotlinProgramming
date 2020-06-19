@@ -1,10 +1,8 @@
-package test1
+package tests.test1
 
 import java.lang.IllegalStateException
-import java.util.*
-import java.util.PriorityQueue
+import java.util.TreeSet
 import kotlin.Comparator
-
 
 /**
  * Priority queue
@@ -16,16 +14,13 @@ class PriorityQueue<E> {
 
     private val treeSet: TreeSet<Entry<E>> = TreeSet(entryComparator)
 
-
     /**
      * Number of enqueued elements
      */
     val size: Int
         get() = treeSet.size
 
-
     private class Entry<E>(val value: E, val priority: Int)
-
 
     /**
      * Add element to the queue
@@ -37,7 +32,6 @@ class PriorityQueue<E> {
         treeSet.add(newEntry)
     }
 
-
     /**
      * Remove element with the highest priority from the queue
      * @return element with the highest priority
@@ -47,4 +41,3 @@ class PriorityQueue<E> {
         return treeSet.pollLast()?.value ?: throw IllegalStateException("Tried to dequeue from the empty queue")
     }
 }
-

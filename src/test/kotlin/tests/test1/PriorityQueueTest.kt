@@ -1,4 +1,4 @@
-package test1
+package tests.test1
 
 import org.junit.jupiter.api.Test
 
@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.fail
 import java.lang.IllegalStateException
-import kotlin.math.abs
 
 
 class Container<E>(val value: E)
